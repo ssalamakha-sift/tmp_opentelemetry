@@ -25,7 +25,8 @@ jobs:
           set -euxo pipefail
           JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $1}')
           JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $2}')
-          VER=$(echo $RELEASE_NAME | awk -F: '{print $1}')
+          RELEASE_TAG=${{ github.event.release.tag_name }} 
+          VER=$(echo $RELEASE_TAG)
 
           [ -d "$DOCKERFILE_PATH" ] && cd $DOCKERFILE_PATH  
           IMAGE_NAME="$JAVA_OPENJDK_NAME"
