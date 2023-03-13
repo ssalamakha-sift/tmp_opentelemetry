@@ -10,18 +10,11 @@ env:
   PATH: "./sift-java-base"  
 
 jobs:
-  build_and_push_to_registry:
-    name: Push Java Docker image with opentelemetry agent to $REGESTRY
-    runs-on: ubuntu-latest
+  build_and_publish:
+    runs-on: ubuntu-latest  
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-      - uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            sift-java-base:
-              - 'sift-java-base/**'
+      - name: Check out repository code
+        uses: actions/checkout@v3
       - name: Parse Dockerfile metadata and push
         run: |
           set -euxo pipefail
