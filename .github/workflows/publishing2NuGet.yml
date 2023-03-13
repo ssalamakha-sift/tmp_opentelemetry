@@ -3,14 +3,11 @@ name: JavaImage2Gcr
 on:
   release:
     types: [published]
-    paths:
-      - 'sift-java-base/*'
 
 env:
   REGESTRY: gcr.io
   PROJECT_ID: sift-shared-data
   DOCKERFILE_PATH: "./sift-java-base"  
-  RELEASE_NAME: ${{ github.event.release.name }}
 
 jobs:
   build_and_publish:
@@ -18,6 +15,12 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            sift-java-base:
+              - 'sift-java-base/**'
       - name: Parse Dockerfile metadata and push
         run: |
           echo "start"
@@ -25,8 +28,7 @@ jobs:
           set -euxo pipefail
           JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $1}')
           JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $2}')
-          RELEASE_TAG=${{ github.event.release.tag_name }} 
-          VER=$(echo $RELEASE_TAG)
+          VER=${{ github.event.release.tag_name }} 
 
           [ -d "$DOCKERFILE_PATH" ] && cd $DOCKERFILE_PATH  
           IMAGE_NAME="$JAVA_OPENJDK_NAME"
