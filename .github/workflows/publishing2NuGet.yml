@@ -7,7 +7,6 @@ on:
 env:
   REGESTRY: gcr.io
   PROJECT_ID: sift-shared-data
-  PATH: "./sift-java-base"  
 
 jobs:
   build_and_publish:
