@@ -10,6 +10,7 @@ env:
   REGESTRY: gcr.io
   PROJECT_ID: sift-shared-data
   DOCKERFILE_PATH: "./sift-java-base"  
+  RELEASE_NAME: ${{ github.event.release.name }}
 
 jobs:
   build_and_publish:
