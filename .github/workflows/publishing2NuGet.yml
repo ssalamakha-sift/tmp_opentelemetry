@@ -15,14 +15,10 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            sift-java-base:
-              - 'sift-java-base/**'
       - name: Parse Dockerfile metadata and push
         run: |
+          diff=$(git diff --name-only sift-java-base)
+          echo $diff
           echo "start"
           ls -la
           set -euxo pipefail
