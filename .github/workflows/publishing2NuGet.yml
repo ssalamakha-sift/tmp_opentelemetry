@@ -3,10 +3,13 @@ name: JavaImage2Gcr
 on:
   release:
     types: [published]
+    paths:
+      - 'sift-java-base/*'
 
 env:
   REGESTRY: gcr.io
   PROJECT_ID: sift-shared-data
+  DOCKERFILE_PATH: "./sift-java-base"  
 
 jobs:
   build_and_publish:
@@ -18,4 +21,14 @@ jobs:
         run: |
           echo "start"
           ls -la
+          set -euxo pipefail
+          JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $1}')
+          JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $2}')
+          VER=$(echo $RELEASE_NAME | awk -F: '{print $1}')
+
+          [ -d "$PATH" ] && cd $PATH  
+          IMAGE_NAME="$JAVA_OPENJDK_NAME"
+          IMAGE_TAG="$JAVA_OPENJDK_VEERSION-$VER"
+
+          [ -z "$IMAGE_NAME" ] || [ -z "$IMAGE_TAG" ] && echo "Failed on parsing $PATH/Dockerfile , IMAGE NAME or TAG is NOT FOUND" && exit 1
           echo "end"
