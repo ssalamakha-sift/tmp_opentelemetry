@@ -22,13 +22,13 @@ jobs:
           echo "start"
           ls -la
           set -euxo pipefail
-          JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $1}')
-          JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $2}')
+          JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $1}')
+          JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $2}')
           VER=$(echo $RELEASE_NAME | awk -F: '{print $1}')
 
-          [ -d "$PATH" ] && cd $PATH  
+          [ -d "$DOCKERFILE_PATH" ] && cd $DOCKERFILE_PATH  
           IMAGE_NAME="$JAVA_OPENJDK_NAME"
           IMAGE_TAG="$JAVA_OPENJDK_VEERSION-$VER"
 
-          [ -z "$IMAGE_NAME" ] || [ -z "$IMAGE_TAG" ] && echo "Failed on parsing $PATH/Dockerfile , IMAGE NAME or TAG is NOT FOUND" && exit 1
+          [ -z "$IMAGE_NAME" ] || [ -z "$IMAGE_TAG" ] && echo "Failed on parsing $DOCKERFILE_PATH/Dockerfile , IMAGE NAME or TAG is NOT FOUND" && exit 1
           echo "end"
