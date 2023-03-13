@@ -17,17 +17,6 @@ jobs:
         uses: actions/checkout@v3
       - name: Parse Dockerfile metadata and push
         run: |
-          set -euxo pipefail
-          JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $1}')
-          JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $2}')
-          VER=$(echo $RELEASE_NAME | awk -F: '{print $1}')
-
-          [ -d "$PATH" ] && cd $PATH  
-          IMAGE_NAME="$JAVA_OPENJDK_NAME"
-          IMAGE_TAG="$JAVA_OPENJDK_VEERSION-$VER"
-
-          [ -z "$IMAGE_NAME" ] || [ -z "$IMAGE_TAG" ] && echo "Failed on parsing $PATH/Dockerfile , IMAGE NAME or TAG is NOT FOUND" && exit 1
-
-          docker build -t $IMAGE_NAME:$IMAGE_TAG .
-          docker tag "$IMAGE_NAME:$IMAGE_TAG" "$REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_TAG" 
-          docker push "$REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_TAG"
+          echo "start"
+          ls -la
+          echo "end"
