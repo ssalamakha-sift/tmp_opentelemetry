@@ -1,0 +1,45 @@
+name: JavaImage2Gcr
+
+on:
+  release:
+    types: [published]
+    paths:
+      - 'sift-java-base/*'
+
+env:
+  REGESTRY: gcr.io
+  PROJECT_ID: sift-shared-data
+  PATH: "./sift-java-base"  
+
+jobs:
+  build_and_push_to_registry:
+    name: Push Java Docker image with opentelemetry agent to Regestry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GCR
+        uses: google-github-actions/setup-gcloud@v0.3.0 
+        with:
+          service_account_key: ${{ secrets.SERVICE_ACCOUNT_KEY }} 
+          project_id: ${{ env.PROJECT_ID }}
+          export_default_credentials: true
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: Configure Docker Client
+        run: |
+          gcloud auth configure-docker --quiet
+      - name: Parse Dockerfile metadata and push
+        run: |
+          set -euxo pipefail
+          JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $1}')
+          JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $2}')
+          VER=$(echo $RELEASE_NAME | awk -F: '{print $1}')
+
+          [ -d "$PATH" ] && cd $PATH  
+          IMAGE_NAME="$JAVA_OPENJDK_NAME"
+          IMAGE_TAG="$JAVA_OPENJDK_VEERSION-$VER"
+
+          [ -z "$IMAGE_NAME" ] || [ -z "$IMAGE_TAG" ] && echo "Failed on parsing $PATH/Dockerfile , IMAGE NAME or TAG is NOT FOUND" && exit 1
+
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          docker tag "$IMAGE_NAME:$IMAGE_TAG" "$REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_TAG" 
+          docker push "$REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_TAG"
