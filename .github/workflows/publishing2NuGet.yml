@@ -3,8 +3,6 @@ name: JavaImage2Gcr
 on:
   release:
     types: [published]
-    paths:
-      - 'sift-java-base/*'
 
 env:
   REGESTRY: gcr.io
@@ -13,14 +11,17 @@ env:
 
 jobs:
   build_and_push_to_registry:
-    name: Push Java Docker image with opentelemetry agent to Regestry
+    name: Push Java Docker image with opentelemetry agent to $REGESTRY
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-      - name: Configure Docker Client
-        run: |
-          gcloud auth configure-docker --quiet
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            sift-java-base:
+              - 'sift-java-base/**'
       - name: Parse Dockerfile metadata and push
         run: |
           set -euxo pipefail
