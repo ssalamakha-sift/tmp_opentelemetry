@@ -20,7 +20,7 @@ jobs:
       - name: Parse Dockerfile metadata and push
         run: |
           #echo $(git diff --name-only HEAD^ HEAD)
-
+          echo some changes
           echo "start"
           ls -la
           set -euxo pipefail
