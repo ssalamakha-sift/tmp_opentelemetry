@@ -22,7 +22,7 @@ jobs:
         with:
           filters: |
             src:
-              - 'sift-java-base/**'
+              - 'sift-java-base/Dockerfile'
       - name: Parse Dockerfile metadata and push
         if: steps.changes.outputs.src == 'true'
         run: |
