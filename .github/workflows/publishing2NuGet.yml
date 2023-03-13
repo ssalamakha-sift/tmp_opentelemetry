@@ -17,10 +17,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Parse Dockerfile metadata and push
         run: |
-          NUMBER_FILES_CHANGED=$(git diff --name-only HEAD ${{ github.event.release.tag_name }}  | wc -l)
-          echo $NUMBER_FILES_CHANGED
-          diff=$(git diff --name-only sift-java-base)
-          echo $diff
+          echo $(git diff --name-only HEAD~1 HEAD~2)
+
           echo "start"
           ls -la
           set -euxo pipefail
