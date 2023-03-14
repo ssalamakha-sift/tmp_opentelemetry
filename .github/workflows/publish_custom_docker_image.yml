@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
     inputs:
       DOCKER_IMAGE_FOR:
-        required: true
-        default: 'java'
         type: choice
         options:
         - java
