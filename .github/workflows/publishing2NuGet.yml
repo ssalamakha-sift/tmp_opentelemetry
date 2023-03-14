@@ -37,7 +37,7 @@ jobs:
           if [ "$IS_FIRST_TAG" = true ]; then
             DIFF=$(git diff-tree --no-commit-id --name-only -r $CURR_COMMIT)
           else   
-            DIFF=$(git diff --name-only $CURR_TAG $PREV_TAG)
+            DIFF=$(git diff --name-only $CURR_TAG $PREV_TAG | xargs)
           fi
 
           echo $DIFF
