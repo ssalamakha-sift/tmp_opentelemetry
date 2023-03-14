@@ -35,6 +35,7 @@ jobs:
 
 
           diff1=$(git diff --name-only $curr_tag $prev_tag)
+          echo "test"
           echo $diff1
 
           echo "start"
