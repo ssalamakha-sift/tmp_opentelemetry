@@ -23,9 +23,13 @@ jobs:
         run: |
           set -euxo pipefail
 
+          current_commit=${{ github.sha }}
+          echo $current_commit
+          echo $(git diff-tree --no-commit-id --name-only -r $current_commit)
+
           echo $(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
 
-          diff=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+          diff=$(git diff-tree --no-commit-id --name-only -r $current_commit)
 
           echo $diff
 
