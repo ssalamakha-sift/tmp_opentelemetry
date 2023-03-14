@@ -17,12 +17,18 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
       - name: Parse metadata 
         run: |
+          set -euxo pipefail
           current_commit=${{ github.sha }}
           echo $current_commit
-          diff=$(git diff-tree --no-commit-id --name-only -r $current_commit)
-          echo $diff
+          echo $(git diff-tree --no-commit-id --name-only -r $current_commit)
+ 
+          echo $(git diff --name-only -r HEAD^1 HEAD)
+          echo $(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+
           echo "start"
           ls -la
           set -euxo pipefail
