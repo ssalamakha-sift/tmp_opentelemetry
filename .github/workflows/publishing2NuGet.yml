@@ -17,14 +17,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            src:
-              - 'sift-java-base/**'
       - name: Parse Dockerfile metadata and push
-        if: steps.changes.outputs.src == 'true'
         run: |
           current_commit=`git log -n 1 --pretty=format:%H`
           echo $current_commit
