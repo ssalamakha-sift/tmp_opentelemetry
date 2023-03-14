@@ -54,10 +54,10 @@ jobs:
       - name: Build Dockerfile from template 
         run: |    
           set -euxo pipefail
-          pwd
+          echo $(pwd)
           [ -d "$DOCKERFILE_PATH" ] && cd $DOCKERFILE_PATH
-          pwd 
-          ls -la  
+          echo $(pwd)
+          echo $(ls -la)
           BASE_IMAGE_NAME="$BASE_IMAGE_NAME" BASE_IMAGE_VERSION="$BASE_IMAGE_VERSION" OPEN_TELEMETRY_VERSION="$OPEN_TELEMETRY_VERSION" CLOUD_PROFILER_VERSION="$CLOUD_PROFILER_VERSION" envsubst < ./Dockerfile_template | tee ./Dockerfile
           cat ./Dockerfile
 
