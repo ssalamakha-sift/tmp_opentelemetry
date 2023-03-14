@@ -1,0 +1,27 @@
+FROM alpine:latest AS staging
+
+ARG OPEN_TELEMETRY_VERSION=${OPEN_TELEMETRY_VERSION}
+ARG CLOUD_PROFILER_VERSION=${CLOUD_PROFILER_VERSION}
+
+WORKDIR /opt/agents
+
+RUN apk add --no-cache wget \
+    && wget -q https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v$OPEN_TELEMETRY_VERSION/opentelemetry-javaagent.jar \
+    && mkdir -p cloud-profiler && cd cloud-profiler \
+    && wget -qO- https://storage.googleapis.com/cloud-profiler/java/cloud-profiler-java-agent_$CLOUD_PROFILER_VERSION.tar.gz | tar xzv
+
+FROM ${BASE_IMAGE_NAME}:${BASE_IMAGE_VERSION}
+
+ARG OPEN_TELEMETRY_VERSION=${OPEN_TELEMETRY_VERSION}
+ARG CLOUD_PROFILER_VERSION=${CLOUD_PROFILER_VERSION}
+
+LABEL maintainer="Sift Inc."
+LABEL java_version=11.0.13
+LABEL open_telemetry_version=$OPEN_TELEMETRY_VERSION
+LABEL cloud_profiler_version=$CLOUD_PROFILER_VERSION
+
+RUN mkdir -p /opt/agents
+COPY --from=staging /opt/agents /opt/agents
+
+ENV TELEMETRY_AGENT=/opt/agents/opentelemetry-javaagent.jar
+ENV CLOUD_PROFILER_PATH=/opt/agents/cloud-profiler
