@@ -22,7 +22,7 @@ jobs:
           current_commit=`git log -n 1 --pretty=format:%H`
           echo $current_commit
           echo ${{ github.sha }}
-          git diff-tree --no-commit-id --name-only -r ${{ github.sha }}
+          echo $(git diff-tree --no-commit-id --name-only -r ${{ github.sha }})
           echo "start"
           ls -la
           set -euxo pipefail
