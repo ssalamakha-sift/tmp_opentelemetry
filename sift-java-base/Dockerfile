@@ -11,7 +11,7 @@ RUN apk add --no-cache wget \
     && wget -qO- https://storage.googleapis.com/cloud-profiler/java/cloud-profiler-java-agent_$CLOUD_PROFILER_VERSION.tar.gz | tar xzv
 
 
-#dummy comment 11
+#dummy comment 12
 FROM azul/zulu-openjdk:11.0.13
 
 ARG OPEN_TELEMETRY_VERSION=1.21.0
