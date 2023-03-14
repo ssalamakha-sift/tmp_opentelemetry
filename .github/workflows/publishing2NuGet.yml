@@ -23,21 +23,29 @@ jobs:
         run: |
           set -euxo pipefail
 
-          curr_tag=$(git tag --sort=-creatordate | sed -n 1p)
-          prev_tag=$(git tag --sort=-creatordate | sed -n 2p)
+          IS_FIRST_TAG=false
+          IS_DOCKERFILE_CHANGED=false
+          DIFF=''
 
+          CURR_TAG=$(git tag --sort=-creatordate | sed -n 1p)
+          PREV_TAG=$(git tag --sort=-creatordate | sed -n 2p)
 
-          current_commit=${{ github.sha }}
-          echo $(git diff-tree --no-commit-id --name-only -r $current_commit)
+          [ -z $PREV_TAG ] && IS_FIRST_TAG=true
 
+          CURR_COMMIT=${{ github.sha }}
 
-          diff1=$(git diff --name-only $curr_tag $prev_tag)
-          echo "test"
-          echo $diff1
+          if [ $IS_FIRST_TAG ]; then
+             DIFF=$(git diff-tree --no-commit-id --name-only -r $CURR_COMMIT)
+             echo $DIFF
+          else   
+            DIFF=$(git diff --name-only $CURR_TAG $PREV_TAG)
+            echo $DIFF
+          fi
 
-          echo "start"
-          ls -la
-          set -euxo pipefail
+          [ $DIFF == *"sift-java-base/Dockerfile"* ] && IS_DOCKERFILE_CHANGED=true
+
+          [ "$IS_DOCKERFILE_CHANGED" = false ] && echo "Current release does not contain changes in sift-java-base/Dockerfile"  && exit 1
+
           JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $1}')
           JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F'/'  '{print $2}' | awk -F: '{print $2}')
           VER=${{ github.event.release.tag_name }} 
@@ -47,7 +55,7 @@ jobs:
           IMAGE_TAG="$JAVA_OPENJDK_VEERSION-$VER"
 
           [ -z "$IMAGE_NAME" ] || [ -z "$IMAGE_TAG" ] && echo "Failed on parsing $DOCKERFILE_PATH/Dockerfile , IMAGE NAME or TAG is NOT FOUND" && exit 1
-          echo "end"
+
       - name: Push Dockerfile
         run: |
           current_commit=${{ github.sha }}
