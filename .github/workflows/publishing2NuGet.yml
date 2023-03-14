@@ -17,11 +17,11 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Parse Dockerfile metadata and push
+      - name: Parse metadata 
         run: |
           current_commit=${{ github.sha }}
           echo $current_commit
-          diff=`git diff-tree --no-commit-id --name-only -r $current_commit`
+          diff=$(git diff-tree --no-commit-id --name-only -r $current_commit)
           echo $diff
           echo "start"
           ls -la
@@ -36,3 +36,7 @@ jobs:
 
           [ -z "$IMAGE_NAME" ] || [ -z "$IMAGE_TAG" ] && echo "Failed on parsing $DOCKERFILE_PATH/Dockerfile , IMAGE NAME or TAG is NOT FOUND" && exit 1
           echo "end"
+      - name: Push Dockerfile
+        run: |
+          current_commit=${{ github.sha }}
+          echo $current_commit
