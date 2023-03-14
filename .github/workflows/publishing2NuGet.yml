@@ -3,8 +3,6 @@ name: JavaImage2Gcr
 on:
   release:
     types: [published]
-    paths:
-    - 'sift-java-base/**'
 
 env:
   REGESTRY: gcr.io
@@ -35,14 +33,14 @@ jobs:
           CURR_COMMIT=${{ github.sha }}
 
           if [ "$IS_FIRST_TAG" = true ]; then
-            DIFF=$(git diff-tree --no-commit-id --name-only -r $CURR_COMMIT)
+            DIFF=$(git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r $CURR_COMMIT | xargs)
           else   
-            DIFF=$(git diff --name-only $CURR_TAG $PREV_TAG | xargs)
+            DIFF=$(git diff --name-only --diff-filter=ACMRT $CURR_TAG $PREV_TAG | xargs)
           fi
 
           echo $DIFF
 
-          [ $DIFF == *"sift-java-base/Dockerfile"* ] && IS_DOCKERFILE_CHANGED=true
+          [[ $DIFF == *"sift-java-base/Dockerfile"* ]] && IS_DOCKERFILE_CHANGED=true
 
           [ "$IS_DOCKERFILE_CHANGED" = false ] && echo "Current release does not contain changes in sift-java-base/Dockerfile"  && exit 1
 
