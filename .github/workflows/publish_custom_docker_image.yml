@@ -76,5 +76,5 @@ jobs:
       steps:
         - name: Dummy step
           run: |
-          echo ${{ github.events.input.DOCKER_IMAGE_FOR }}
+          echo "DOCKER_IMAGE_FOR ${{ github.events.input.DOCKER_IMAGE_FOR }}"
           echo "NOT IMPLEMENTED YET" && exit 1
