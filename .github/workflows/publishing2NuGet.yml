@@ -29,6 +29,10 @@ jobs:
 
           echo $(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
 
+          diff1=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})
+
+          echo $diff1
+
           diff=$(git diff-tree --no-commit-id --name-only -r $current_commit)
 
           echo $diff
