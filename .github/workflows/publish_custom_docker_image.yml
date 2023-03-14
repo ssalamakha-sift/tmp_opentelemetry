@@ -43,7 +43,7 @@ jobs:
       DEFAULT_CLOUD_PROFILER_VERSION: "20220905_RC00"
     runs-on: ubuntu-latest
     steps:
-      if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
+      - if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
       - name: Parse workflow inputs 
         run: |
           set -euxo pipefail
@@ -60,13 +60,12 @@ jobs:
           BASE_IMAGE_NAME="$BASE_IMAGE_NAME" BASE_IMAGE_VERSION="$BASE_IMAGE_VERSION" OPEN_TELEMETRY_VERSION="$OPEN_TELEMETRY_VERSION" CLOUD_PROFILER_VERSION="$CLOUD_PROFILER_VERSION" envsubst < ./Dockerfile_template | tee ./Dockerfile > /dev/null
 
 
-
   prepare_dockerfile_python: 
     env:
       DOCKERFILE_PATH: "./sift-python-base"  
     runs-on: ubuntu-latest
     steps:
-      if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'python'}}
+      - if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'python'}}
       - name: Dummy step
         run: echo "NOT IMPLEMENTED YET" && exit 1
 
