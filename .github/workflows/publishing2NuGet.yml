@@ -35,13 +35,13 @@ jobs:
           CURR_COMMIT=${{ github.sha }}
 
           if [ $IS_FIRST_TAG ]; then
-             DIFF=$(git diff-tree --no-commit-id --name-only -r $CURR_COMMIT)
-             echo $DIFF
+            DIFF=$(git diff-tree --no-commit-id --name-only -r $CURR_COMMIT)
           else   
             DIFF=$(git diff --name-only $CURR_TAG $PREV_TAG)
-            echo $DIFF
           fi
 
+          echo $DIFF
+          
           [ $DIFF == *"sift-java-base/Dockerfile"* ] && IS_DOCKERFILE_CHANGED=true
 
           [ "$IS_DOCKERFILE_CHANGED" = false ] && echo "Current release does not contain changes in sift-java-base/Dockerfile"  && exit 1
@@ -52,7 +52,9 @@ jobs:
 
           [ -d "$DOCKERFILE_PATH" ] && cd $DOCKERFILE_PATH  
           IMAGE_NAME="$JAVA_OPENJDK_NAME"
+          echo $IMAGE_NAME
           IMAGE_TAG="$JAVA_OPENJDK_VEERSION-$VER"
+          echo $IMAGE_TAG
 
           [ -z "$IMAGE_NAME" ] || [ -z "$IMAGE_TAG" ] && echo "Failed on parsing $DOCKERFILE_PATH/Dockerfile , IMAGE NAME or TAG is NOT FOUND" && exit 1
 
