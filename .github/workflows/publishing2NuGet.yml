@@ -27,9 +27,6 @@ jobs:
           prev_tag=$(git tag --sort=-creatordate | sed -n 2p)
 
 
-          curr_tag_commit=$(git rev-list -n 1 tags/$curr_tag)
-          prev_tag_commit=$(git rev-list -n 1 tags/$prev_tag)
-
           current_commit=${{ github.sha }}
           echo $(git diff-tree --no-commit-id --name-only -r $current_commit)
 
