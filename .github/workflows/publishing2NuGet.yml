@@ -40,6 +40,8 @@ jobs:
 
           echo $DIFF
 
+          echo "TEST"
+
           [[ $DIFF == *"sift-java-base/Dockerfile"* ]] && IS_DOCKERFILE_CHANGED=true
 
           [ "$IS_DOCKERFILE_CHANGED" = false ] && echo "Current release does not contain changes in sift-java-base/Dockerfile"  && exit 1
