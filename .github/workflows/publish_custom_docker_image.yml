@@ -43,7 +43,7 @@ jobs:
       DEFAULT_OPEN_TELEMETRY_VERSION: "1.21.0"
       CLOUD_PROFILER_VERSION: ${{ github.events.input.CLOUD_PROFILER_VERSION }}
       DEFAULT_CLOUD_PROFILER_VERSION: "20220905_RC00"
-    if: ${{ github.events.input.docker_image_for  == 'java'}}
+    if: ${{ github.events.input.DOCKER_IMAGE_FOR  == 'java'}}
     runs-on: ubuntu-latest
     steps:
       - name: Parse workflow inputs 
@@ -64,7 +64,7 @@ jobs:
   prepare_dockerfile_python: 
     env:
       DOCKERFILE_PATH: "./sift-python-base"  
-    if: ${{ github.events.input.docker_image_for  == 'python'}}
+    if: ${{ github.events.input.DOCKER_IMAGE_FOR  == 'python'}}
     runs-on: ubuntu-latest
     steps:
       - name: Dummy step
@@ -75,4 +75,6 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - name: Dummy step
-          run: echo "NOT IMPLEMENTED YET" && exit 1
+          run: |
+          echo ${{ github.events.input.DOCKER_IMAGE_FOR }}
+          echo "NOT IMPLEMENTED YET" && exit 1
