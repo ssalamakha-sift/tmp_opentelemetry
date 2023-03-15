@@ -93,7 +93,15 @@ jobs:
       needs: [prepare_dockerfile_java, prepare_dockerfile_python]
       runs-on: ubuntu-latest
       steps:
+        - uses: actions/download-artifact@v3
+          with:
+            name: assets
+            path: ./assets
         - name: Dummy step
           run: |
+            echo $(pwd)
+            echo $(ls -la)
+            cd ./assets
+            echo $(ls -la)
             echo "DOCKER_IMAGE_FOR ${{ github.event.inputs.DOCKER_IMAGE_FOR }}"
-            echo "NOT IMPLEMENTED YET" && exit 1
+            echo "NOT IMPLEMENTED YET" && exit 0
