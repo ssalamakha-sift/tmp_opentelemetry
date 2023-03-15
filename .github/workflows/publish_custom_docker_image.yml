@@ -92,9 +92,8 @@ jobs:
             path: ./assets
         - name: Dummy step
           run: |
-            echo $(pwd)
-            echo $(ls -la)
-            cd ./assets
-            echo $(ls -la)
+            cat ./assets/Dockerfile
+            echo " +++ "
+            cat ./assets/Dockerfile_meta
             echo "DOCKER_IMAGE_FOR ${{ github.event.inputs.DOCKER_IMAGE_FOR }}"
             echo "NOT IMPLEMENTED YET" && exit 0
