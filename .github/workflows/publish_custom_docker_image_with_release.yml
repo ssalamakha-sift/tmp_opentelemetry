@@ -1,4 +1,4 @@
-name: Publish custom Docker Image to GCR
+name: Publish custom Docker Image to GCR v1
 
 on:
   release:
