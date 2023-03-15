@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Parse release 
-        if: ${{ github.event.inputs.RELEASE_NAME  == *":java"* }}
+        if: contains(env.RELEASE_NAME, 'java')
         run: |
           set -euxo pipefail
           for input in $(echo $RELEASE_BODY)
