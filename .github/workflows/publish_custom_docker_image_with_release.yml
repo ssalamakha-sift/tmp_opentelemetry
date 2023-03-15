@@ -48,10 +48,6 @@ jobs:
         if: contains(env.RELEASE_NAME, 'java')
         run: |   
           set -euxo pipefail
-          echo $BASE_IMAGE_NAME
-          echo $BASE_IMAGE_VERSION
-          echo $OPEN_TELEMETRY_VERSION
-          echo $CLOUD_PROFILER_VERSION
           IMAGE_NAME=$(echo $BASE_IMAGE_NAME | tr / -)
           R_TAG=$(echo $RELEASE_TAG | cut -d "_" -f1)
           IMAGE_VERSION="$BASE_IMAGE_VERSION-$OPEN_TELEMETRY_VERSION-$CLOUD_PROFILER_VERSION-$R_TAG"
@@ -78,7 +74,6 @@ jobs:
         if: contains(env.RELEASE_NAME, 'python')
         run: echo "NOT IMPLEMENTED YET" && exit 1
 
-  #image name, version, dir optional - lables csv name=value
   build_and_push:
       needs: [prepare_dockerfile_java, prepare_dockerfile_python]
       runs-on: ubuntu-latest
@@ -92,5 +87,4 @@ jobs:
             cat ./assets/Dockerfile
             echo " +++ "
             cat ./assets/Dockerfile_meta
-            echo "DOCKER_IMAGE_FOR ${{ github.event.inputs.DOCKER_IMAGE_FOR }}"
             echo "NOT IMPLEMENTED YET" && exit 0
