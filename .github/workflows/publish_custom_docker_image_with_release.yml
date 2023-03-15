@@ -9,6 +9,7 @@ env:
   PROJECT_ID: sift-shared-data
   RELEASE_NAME: ${{ github.event.release.name }}
   RELEASE_BODY: ${{ github.event.release.body }}
+  RELEASE_TAG: ${{ github.event.release.tag_name }}
 
 jobs:     
   prepare_dockerfile_java:
@@ -26,12 +27,11 @@ jobs:
           set -euxo pipefail
           for input in $(echo $RELEASE_BODY)
           do
-            echo $input
+            [[ "$input" == *"BASE_IMAGE_NAME"* ]] && echo "BASE_IMAGE_NAME=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV || echo "BASE_IMAGE_NAME=$(echo $DEFAULT_BASE_IMAGE_NAME)" >> $GITHUB_ENV
+            [[ "$input" == *"BASE_IMAGE_VERSION"* ]] && echo "BASE_IMAGE_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV || echo "BASE_IMAGE_VERSION=$(echo $DEFAULT_BASE_IMAGE_VERSION)" >> $GITHUB_ENV
+            [[ "$input" == *"OPEN_TELEMETRY_VERSION"* ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV || echo "OPEN_TELEMETRY_VERSION=$(echo $DEFAULT_OPEN_TELEMETRY_VERSION)" >> $GITHUB_ENV
+            [[ "$input" == *"CLOUD_PROFILER_VERSION"* ]] && echo "CLOUD_PROFILER_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV || echo "CLOUD_PROFILER_VERSION=$(echo $DEFAULT_CLOUD_PROFILER_VERSION)" >> $GITHUB_ENV
           done
-          [ -z "$BASE_IMAGE_NAME" ] && echo "BASE_IMAGE_NAME=$(echo $DEFAULT_BASE_IMAGE_NAME)" >> $GITHUB_ENV
-          [ -z "$BASE_IMAGE_VERSION" ] && echo "BASE_IMAGE_VERSION=$(echo $DEFAULT_BASE_IMAGE_VERSION)" >> $GITHUB_ENV
-          [ -z "$OPEN_TELEMETRY_VERSION" ] && echo "OPEN_TELEMETRY_VERSION=$(echo $DEFAULT_OPEN_TELEMETRY_VERSION)" >> $GITHUB_ENV
-          [ -z "$CLOUD_PROFILER_VERSION" ] && echo "CLOUD_PROFILER_VERSION=$(echo $DEFAULT_CLOUD_PROFILER_VERSION)" >> $GITHUB_ENV
       - name: Check out repository
         if: contains(env.RELEASE_NAME, 'java')
         uses: actions/checkout@v3
@@ -39,7 +39,8 @@ jobs:
         if: contains(env.RELEASE_NAME, 'java')
         run: |   
           IMAGE_NAME=$(echo $BASE_IMAGE_NAME | tr / -)
-          IMAGE_VERSION="BASE_IMAGE_VERSION-$OPEN_TELEMETRY_VERSION-$CLOUD_PROFILER_VERSION"
+          R_TAG=$(echo $RELEASE_TAG | cut -d '_' f1)
+          IMAGE_VERSION="BASE_IMAGE_VERSION-$OPEN_TELEMETRY_VERSION-$CLOUD_PROFILER_VERSION-$R_TAG"
           mkdir -p ./assets 
           echo "IMAGE_NAME=$IMAGE_NAME" >> ./assets/Dockerfile_meta
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> ./assets/Dockerfile_meta
