@@ -1,0 +1,96 @@
+name: Publish custom Docker Image to GCR
+
+on:
+  release:
+    types: [published]
+
+env:
+  REGESTRY: gcr.io
+  PROJECT_ID: sift-shared-data
+  DOCKER_IMAGE_FOR: NOT_SET
+
+jobs:
+  parse_workflow_inputs:
+    env:
+      RELEASE_NAME: ${{ github.event.release.name }}
+    runs-on: ubuntu-latest
+    steps:   
+      - name: Parse Release inputs 
+        run: |
+          set -euxo pipefail
+          echo $RELEASE_NAME
+          for input in $(echo $RELEASE_NAME | tr " " "\n")
+          do
+            [[ "$input" == *"DOCKER_IMAGE_FOR:java "* ]] && echo "DOCKER_IMAGE_FOR=java" >> $GITHUB_ENV && break
+          done
+     
+  prepare_dockerfile_java:
+    needs: parse_workflow_inputs
+    env:
+      RELEASE_NAME: ${{ github.event.release.name }}
+      DOCKERFILE_PATH: "./sift-java-base"
+      BASE_IMAGE_NAME: ${{ github.event.inputs.BASE_IMAGE_NAME }}
+      DEFAULT_BASE_IMAGE_NAME: "azul/zulu-openjdk"
+      BASE_IMAGE_VERSION: ${{ github.event.inputs.BASE_IMAGE_VERSION }}
+      DEFAULT_BASE_IMAGE_VERSION: "11.0.13"
+      OPEN_TELEMETRY_VERSION: ${{ github.event.inputs.OPEN_TELEMETRY_VERSION }}
+      DEFAULT_OPEN_TELEMETRY_VERSION: "1.21.0"
+      CLOUD_PROFILER_VERSION: ${{ github.event.inputs.CLOUD_PROFILER_VERSION }}
+      DEFAULT_CLOUD_PROFILER_VERSION: "20220905_RC00"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse workflow inputs 
+        if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
+        run: |
+          set -euxo pipefail
+          [ -z "$BASE_IMAGE_NAME" ] && echo "BASE_IMAGE_NAME=$(echo $DEFAULT_BASE_IMAGE_NAME)" >> $GITHUB_ENV
+          [ -z "$BASE_IMAGE_VERSION" ] && echo "BASE_IMAGE_VERSION=$(echo $DEFAULT_BASE_IMAGE_VERSION)" >> $GITHUB_ENV
+          [ -z "$OPEN_TELEMETRY_VERSION" ] && echo "OPEN_TELEMETRY_VERSION=$(echo $DEFAULT_OPEN_TELEMETRY_VERSION)" >> $GITHUB_ENV
+          [ -z "$CLOUD_PROFILER_VERSION" ] && echo "CLOUD_PROFILER_VERSION=$(echo $DEFAULT_CLOUD_PROFILER_VERSION)" >> $GITHUB_ENV
+      - name: Check out repository
+        if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
+        uses: actions/checkout@v3
+      - name: Prepare Dockerfile metadata 
+        if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
+        run: |   
+          IMAGE_NAME=$(echo $BASE_IMAGE_NAME | tr / -)
+          IMAGE_VERSION="BASE_IMAGE_VERSION-$OPEN_TELEMETRY_VERSION-$CLOUD_PROFILER_VERSION"
+          mkdir -p ./assets 
+          echo "IMAGE_NAME=$IMAGE_NAME" >> ./assets/Dockerfile_meta
+          echo "IMAGE_VERSION=$IMAGE_VERSION" >> ./assets/Dockerfile_meta
+      - name: Build Dockerfile from template 
+        if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
+        run: |    
+          set -euxo pipefail
+          BASE_IMAGE_NAME="$BASE_IMAGE_NAME" BASE_IMAGE_VERSION="$BASE_IMAGE_VERSION" OPEN_TELEMETRY_VERSION="$OPEN_TELEMETRY_VERSION" CLOUD_PROFILER_VERSION="$CLOUD_PROFILER_VERSION" envsubst < $DOCKERFILE_PATH/Dockerfile_template | tee ./assets/Dockerfile > /dev/null
+      - uses: actions/upload-artifact@v3
+        with:
+          name: assets
+          path: ./assets 
+
+  prepare_dockerfile_python: 
+    needs: parse_workflow_inputs
+    env:
+      DOCKERFILE_PATH: "./sift-python-base"  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dummy step
+        if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'python'}}
+        run: echo "NOT IMPLEMENTED YET" && exit 1
+
+  #image name, version, dir optional - lables csv name=value
+  build_and_push:
+      needs: [prepare_dockerfile_java, prepare_dockerfile_python]
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/download-artifact@v3
+          with:
+            name: assets
+            path: ./assets
+        - name: Dummy step
+          run: |
+            cat ./assets/Dockerfile
+            echo " +++ "
+            cat ./assets/Dockerfile_meta
+            echo "DOCKER_IMAGE_FOR ${{ github.event.inputs.DOCKER_IMAGE_FOR }}"
+            echo "NOT IMPLEMENTED YET" && exit 0
