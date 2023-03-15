@@ -71,7 +71,9 @@ jobs:
           echo "IMAGE_NAME=$IMAGE_NAME" >> ./assets/Dockerfile_meta
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> ./assets/Dockerfile_meta
           mv $DOCKERFILE_PATH/Dockerfile ./assets/Dockerfile
-          echo $(ls -la ./assets)
+          echo $(ls -la)
+          cd ./assets
+          cho $(ls -la)
       - uses: actions/upload-artifact@v3
         with:
           name: assets
