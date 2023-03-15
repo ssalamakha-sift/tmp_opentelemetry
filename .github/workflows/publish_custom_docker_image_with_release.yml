@@ -94,7 +94,7 @@ jobs:
             set -euxo pipefail
             cd ./assets 
 
-            DOCKER_IMAGE_FOR=$(echo $RELEASE_NAME | cut -d ':' -f2)
+            DOCKER_IMAGE_FOR=$(echo $RELEASE_NAME | cut -d " " -f1 | cut -d ":" -f2)
 
             echo $IMAGE_NAME
             echo $IMAGE_VERSION
