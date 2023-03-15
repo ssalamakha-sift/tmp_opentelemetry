@@ -24,7 +24,7 @@ jobs:
       - name: Parse release 
         if: contains(env.RELEASE_NAME, 'java')
         run: |
-          #set -euxo pipefail
+          set -euxo pipefail
           for input in $(echo $RELEASE_BODY | tr \r \n)
           do
             [[ "$input" == *"BASE_IMAGE_NAME"* ]] && echo "BASE_IMAGE_NAME=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV && break || echo "BASE_IMAGE_NAME=$(echo $DEFAULT_BASE_IMAGE_NAME)" >> $GITHUB_ENV && break
