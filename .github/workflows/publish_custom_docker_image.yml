@@ -54,26 +54,19 @@ jobs:
       - name: Check out repository
         if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
         uses: actions/checkout@v3
-      - name: Build Dockerfile from template 
-        if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
-        run: |    
-          set -euxo pipefail
-          [ -d "$DOCKERFILE_PATH" ] && cd $DOCKERFILE_PATH
-          BASE_IMAGE_NAME="$BASE_IMAGE_NAME" BASE_IMAGE_VERSION="$BASE_IMAGE_VERSION" OPEN_TELEMETRY_VERSION="$OPEN_TELEMETRY_VERSION" CLOUD_PROFILER_VERSION="$CLOUD_PROFILER_VERSION" envsubst < ./Dockerfile_template | tee ./Dockerfile > /dev/null
-          cd -
       - name: Prepare Dockerfile metadata 
         if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
         run: |   
-          echo $(pwd)
           IMAGE_NAME=$(echo $BASE_IMAGE_NAME | tr / -)
           IMAGE_VERSION="BASE_IMAGE_VERSION-$OPEN_TELEMETRY_VERSION-$CLOUD_PROFILER_VERSION"
           mkdir -p ./assets 
           echo "IMAGE_NAME=$IMAGE_NAME" >> ./assets/Dockerfile_meta
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> ./assets/Dockerfile_meta
-          mv $DOCKERFILE_PATH/Dockerfile ./assets/Dockerfile
-          echo $(ls -la)
-          cd ./assets
-          echo $(ls -la)
+      - name: Build Dockerfile from template 
+        if: ${{ github.event.inputs.DOCKER_IMAGE_FOR  == 'java'}}
+        run: |    
+          set -euxo pipefail
+          BASE_IMAGE_NAME="$BASE_IMAGE_NAME" BASE_IMAGE_VERSION="$BASE_IMAGE_VERSION" OPEN_TELEMETRY_VERSION="$OPEN_TELEMETRY_VERSION" CLOUD_PROFILER_VERSION="$CLOUD_PROFILER_VERSION" envsubst < $DOCKERFILE_PATH/Dockerfile_template | tee ./assets/Dockerfile > /dev/null
       - uses: actions/upload-artifact@v3
         with:
           name: assets
