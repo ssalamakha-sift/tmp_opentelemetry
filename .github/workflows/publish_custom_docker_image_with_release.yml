@@ -19,10 +19,9 @@ jobs:
         run: |
           set -euxo pipefail
           echo $RELEASE_NAME
-          for input in $(echo $RELEASE_NAME | tr " " "\n")
-          do
-            [[ "$input" == *"DOCKER_IMAGE_FOR:java "* ]] && echo "DOCKER_IMAGE_FOR=java" >> $GITHUB_ENV && break
-          done
+          echo $DOCKER_IMAGE_FOR
+          [[ "$RELEASE_NAME" == *"DOCKER_IMAGE_FOR:java "* ]] && echo "DOCKER_IMAGE_FOR=java" >> $GITHUB_ENV
+          echo $DOCKER_IMAGE_FOR
      
   prepare_dockerfile_java:
     needs: parse_workflow_inputs
