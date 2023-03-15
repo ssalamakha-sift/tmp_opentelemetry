@@ -82,9 +82,24 @@ jobs:
           with:
             name: assets
             path: ./assets
-        - name: Dummy step
+        - name: Fetch Docker metadata
           run: |
-            cat ./assets/Dockerfile
-            echo " +++ "
-            cat ./assets/Dockerfile_meta
+            set -euxo pipefail
+            while IFS= read -r line; do
+              [[ "$line" == *"IMAGE_NAME"* ]] && echo "IMAGE_NAME=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
+              [[ "$line" == *"IMAGE_VERSION"* ]] && echo "IMAGE_VERSION=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
+            done < ./assets/Dockerfile_meta
+        - name: Push Dockerfile
+          run: |
+            set -euxo pipefail
+            cd ./assets 
+
+            DOCKER_IMAGE_FOR=$(echo $RELEASE_NAME | cut -d ':' -f2)
+
+            echo $IMAGE_NAME
+            echo $IMAGE_VERSION
+
             echo "NOT IMPLEMENTED YET" && exit 0
+            docker build -t $IMAGE_NAME:$IMAGE_VERSION .
+            docker tag "$IMAGE_NAME:$IMAGE_VERSION" "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION" 
+            docker push "$REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_VERSION"
