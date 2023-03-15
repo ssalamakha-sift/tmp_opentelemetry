@@ -8,17 +8,18 @@ env:
   REGESTRY: gcr.io
   PROJECT_ID: sift-shared-data
   DOCKER_IMAGE_FOR: NOT_SET
+  RELEASE_NAME: ${{ github.event.release.name }}
+  RELEASE_BODY: ${{ github.event.release.body }}
 
 jobs:
   parse_workflow_inputs:
-    env:
-      RELEASE_NAME: ${{ github.event.release.name }}
     runs-on: ubuntu-latest
     steps:   
       - name: Parse Release inputs 
         run: |
           set -euxo pipefail
           echo $RELEASE_NAME
+          echo $RELEASE_BODY
           echo $DOCKER_IMAGE_FOR
           [[ "$RELEASE_NAME" == *"DOCKER_IMAGE_FOR:java "* ]] && echo "DOCKER_IMAGE_FOR=java" >> $GITHUB_ENV
           echo $DOCKER_IMAGE_FOR
