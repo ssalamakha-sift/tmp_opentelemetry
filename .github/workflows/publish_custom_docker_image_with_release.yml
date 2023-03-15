@@ -24,14 +24,18 @@ jobs:
       - name: Parse release 
         if: contains(env.RELEASE_NAME, 'java')
         run: |
-          set -euxo pipefail
-          for input in $(echo $RELEASE_BODY)
+          #set -euxo pipefail
+          for input in $(echo $RELEASE_BODY | tr \r \n)
           do
-            [[ "$input" == *"BASE_IMAGE_NAME"* ]] && echo "BASE_IMAGE_NAME=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV || echo "BASE_IMAGE_NAME=$(echo $DEFAULT_BASE_IMAGE_NAME)" >> $GITHUB_ENV
-            [[ "$input" == *"BASE_IMAGE_VERSION"* ]] && echo "BASE_IMAGE_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV || echo "BASE_IMAGE_VERSION=$(echo $DEFAULT_BASE_IMAGE_VERSION)" >> $GITHUB_ENV
-            [[ "$input" == *"OPEN_TELEMETRY_VERSION"* ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV || echo "OPEN_TELEMETRY_VERSION=$(echo $DEFAULT_OPEN_TELEMETRY_VERSION)" >> $GITHUB_ENV
-            [[ "$input" == *"CLOUD_PROFILER_VERSION"* ]] && echo "CLOUD_PROFILER_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV || echo "CLOUD_PROFILER_VERSION=$(echo $DEFAULT_CLOUD_PROFILER_VERSION)" >> $GITHUB_ENV
+            [[ "$input" == *"BASE_IMAGE_NAME"* ]] && echo "BASE_IMAGE_NAME=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV && break || echo "BASE_IMAGE_NAME=$(echo $DEFAULT_BASE_IMAGE_NAME)" >> $GITHUB_ENV && break
+            [[ "$input" == *"BASE_IMAGE_VERSION"* ]] && echo "BASE_IMAGE_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV && break || echo "BASE_IMAGE_VERSION=$(echo $DEFAULT_BASE_IMAGE_VERSION)" >> $GITHUB_ENV && break
+            [[ "$input" == *"OPEN_TELEMETRY_VERSION"* ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV && break || echo "OPEN_TELEMETRY_VERSION=$(echo $DEFAULT_OPEN_TELEMETRY_VERSION)" >> $GITHUB_ENV && break
+            [[ "$input" == *"CLOUD_PROFILER_VERSION"* ]] && echo "CLOUD_PROFILER_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV && break || echo "CLOUD_PROFILER_VERSION=$(echo $DEFAULT_CLOUD_PROFILER_VERSION)" >> $GITHUB_ENV && break
           done
+          echo $BASE_IMAGE_NAME
+          echo $BASE_IMAGE_VERSION
+          echo $OPEN_TELEMETRY_VERSION
+          echo $CLOUD_PROFILER_VERSION
       - name: Check out repository
         if: contains(env.RELEASE_NAME, 'java')
         uses: actions/checkout@v3
