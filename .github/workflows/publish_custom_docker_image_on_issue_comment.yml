@@ -8,8 +8,8 @@ env:
   REGESTRY: gcr.io
   PROJECT_ID: sift-shared-data
   ISSUE_TITLE: ${{ github.event.issue.title }}
-  ISSUE_COMMENT: ${{ github.event.comment.body }}
-
+  ISSUE_COMMENT_BODY: ${{ github.event.comment.body }}
+  ISSUE_COMMENT_ID: ${{ github.event.comment.id }}
 
 jobs:     
   prepare_dockerfile_java:
@@ -25,14 +25,84 @@ jobs:
       CLOUD_PROFILER_VERSION: NOT_SET
     runs-on: ubuntu-latest
     steps:
-      - name: Parse release 
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Parse issue comment body
+        if: contains(env.ISSUE_TITLE, 'java')
         run: |
           set -euxo pipefail
-          echo $ISSUE_TITLE
-          echo $ISSUE_COMMENT
-          echo $GITHUB_CONTEXT
+          [[ "$BASE_IMAGE_NAME" == "NOT_SET" ]] && echo "BASE_IMAGE_NAME=$(echo $DEFAULT_BASE_IMAGE_NAME)" >> $GITHUB_ENV
+          [[ "$BASE_IMAGE_VERSION" == "NOT_SET" ]] && echo "BASE_IMAGE_VERSION=$(echo $DEFAULT_BASE_IMAGE_VERSION)" >> $GITHUB_ENV
+          [[ "$OPEN_TELEMETRY_VERSION" == "NOT_SET" ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $DEFAULT_OPEN_TELEMETRY_VERSION)" >> $GITHUB_ENV
+          [[ "$CLOUD_PROFILER_VERSION" == "NOT_SET" ]] && echo "CLOUD_PROFILER_VERSION=$(echo $DEFAULT_CLOUD_PROFILER_VERSION)" >> $GITHUB_ENV
+          for input in $(echo $ISSUE_COMMENT_BODY | tr -d '\r' | tr -d ' ')
+          do
+            [[ "$input" == *"BASE_IMAGE_NAME"* ]] && echo "BASE_IMAGE_NAME=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV && continue
+            [[ "$input" == *"BASE_IMAGE_VERSION"* ]] && echo "BASE_IMAGE_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV && continue
+            [[ "$input" == *"OPEN_TELEMETRY_VERSION"* ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV && continue
+            [[ "$input" == *"CLOUD_PROFILER_VERSION"* ]] && echo "CLOUD_PROFILER_VERSION=$(echo $input | cut -d ':' -f2)" >> $GITHUB_ENV && continue
+          done
+      - name: Check out repository
+        if: contains(env.ISSUE_TITLE, 'java')
+        uses: actions/checkout@v3
+      - name: Prepare Dockerfile metadata 
+        if: contains(env.ISSUE_TITLE, 'java')
+        run: |   
+          set -euxo pipefail
+          IMAGE_NAME=$(echo $BASE_IMAGE_NAME | tr / -)
+          R_TAG=$(echo $RELEASE_TAG | cut -d "_" -f1)
+          IMAGE_VERSION="$BASE_IMAGE_VERSION-$R_TAG-$ISSUE_COMMENT_ID"
+          mkdir -p ./assets 
+          echo "IMAGE_NAME=$IMAGE_NAME" >> ./assets/Dockerfile_meta
+          echo "IMAGE_VERSION=$IMAGE_VERSION" >> ./assets/Dockerfile_meta
+      - name: Build Dockerfile from template 
+        if: contains(env.ISSUE_TITLE, 'java')
+        run: |    
+          set -euxo pipefail
+          BASE_IMAGE_NAME="$BASE_IMAGE_NAME" BASE_IMAGE_VERSION="$BASE_IMAGE_VERSION" OPEN_TELEMETRY_VERSION="$OPEN_TELEMETRY_VERSION" CLOUD_PROFILER_VERSION="$CLOUD_PROFILER_VERSION" envsubst < $DOCKERFILE_PATH/Dockerfile_template | tee ./assets/Dockerfile > /dev/null
+      - uses: actions/upload-artifact@v3
+        if: contains(env.ISSUE_TITLE, 'java')
+        with:
+          name: assets
+          path: ./assets 
+
+  prepare_dockerfile_python: 
+    env:
+      DOCKERFILE_PATH: "./sift-python-base"  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dummy step
+        if: contains(env.ISSUE_TITLE, 'python')
+        run: echo "NOT IMPLEMENTED YET" && exit 1
+
+  build_and_push:
+      needs: [prepare_dockerfile_java, prepare_dockerfile_python]
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/download-artifact@v3
+          with:
+            name: assets
+            path: ./assets
+        - name: Fetch Dockerfile metadata
+          run: |
+            set -euxo pipefail
+            while IFS= read -r line; do
+              [[ "$line" == *"IMAGE_NAME"* ]] && echo "IMAGE_NAME=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
+              [[ "$line" == *"IMAGE_VERSION"* ]] && echo "IMAGE_VERSION=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
+            done < ./assets/Dockerfile_meta
+        - name: Push Dockerfile
+          run: |
+            set -euxo pipefail
+            cd ./assets 
+
+            DOCKER_IMAGE_FOR=$(echo $ISSUE_TITLE | cut -d " " -f1 | cut -d ":" -f2)
+
+            echo $IMAGE_NAME
+            echo $IMAGE_VERSION
+
+            echo "NOT IMPLEMENTED YET" && exit 0
+            docker build -t $IMAGE_NAME:$IMAGE_VERSION .
+            docker tag "$IMAGE_NAME:$IMAGE_VERSION" "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION" 
+            docker push "$REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_VERSION"
+
 
 
  
