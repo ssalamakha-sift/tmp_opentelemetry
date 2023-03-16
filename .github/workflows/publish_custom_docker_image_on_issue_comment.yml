@@ -8,6 +8,7 @@ env:
   REGESTRY: gcr.io
   PROJECT_ID: sift-shared-data
   ISSUE_TITLE: ${{ github.event.issue.title }}
+  ISSUE_COMMENT: ${{ github.event.issue.comment }}
 
 
 jobs:     
@@ -28,5 +29,7 @@ jobs:
         run: |
           set -euxo pipefail
           echo $ISSUE_TITLE
+          echo $ISSUE_COMMENT
+          echo ${{ github.event.issue_comment.comment }}
 
  
