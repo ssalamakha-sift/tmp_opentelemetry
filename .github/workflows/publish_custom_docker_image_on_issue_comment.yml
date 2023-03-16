@@ -26,10 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Parse release 
+        env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
           set -euxo pipefail
           echo $ISSUE_TITLE
           echo $ISSUE_COMMENT
-          echo ${{ github.event.comment.body }}
+          echo $GITHUB_CONTEXT
+
 
  
