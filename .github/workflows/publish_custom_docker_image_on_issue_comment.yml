@@ -28,7 +28,7 @@ jobs:
       TAG: NOT_SET
       IS_DECLINED: False
     permissions:
-      issue: write
+      issues: write
     runs-on: ubuntu-latest
     steps:
       - name: Parse issue comment body
