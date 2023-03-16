@@ -48,7 +48,6 @@ jobs:
         if: contains(env.ISSUE_TITLE, 'java')
         uses: actions/checkout@v3
         with:
-          ref: "$TAG"
           fetch-depth: 0
       - name: Prepare Dockerfile metadata 
         if: contains(env.ISSUE_TITLE, 'java')
@@ -64,6 +63,7 @@ jobs:
         if: contains(env.ISSUE_TITLE, 'java')
         run: |    
           set -euxo pipefail
+          git checkout tags/$TAG
           BASE_IMAGE_NAME="$BASE_IMAGE_NAME" BASE_IMAGE_VERSION="$BASE_IMAGE_VERSION" OPEN_TELEMETRY_VERSION="$OPEN_TELEMETRY_VERSION" CLOUD_PROFILER_VERSION="$CLOUD_PROFILER_VERSION" envsubst < $DOCKERFILE_PATH/Dockerfile_template | tee ./assets/Dockerfile > /dev/null
       - uses: actions/upload-artifact@v3
         if: contains(env.ISSUE_TITLE, 'java')
