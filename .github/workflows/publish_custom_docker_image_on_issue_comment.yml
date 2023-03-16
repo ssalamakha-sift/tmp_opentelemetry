@@ -118,8 +118,18 @@ jobs:
           run: |
             set -euxo pipefail
             echo $(ls -la ./assets)
-            [[ -f "./assets/Dockerfile_meta" ]] && echo "./assets/Dockerfile_meta exists" || echo "./assets/Dockerfile_meta not found" && exit 1
-            [[ -f "./assets/Dockerfile" ]] && echo "./assets/Dockerfile exists" || echo "./assets/Dockerfile not found" && exit 1
+            FILES_EXIST=True
+            [[ ! -f "./assets/Dockerfile_meta" ]] || [[ ! -f "./assets/Dockerfile" ]] && FILES_EXIST=False
+            if [ $FILES_EXIST = false ]; then
+              gh api \
+                --method POST \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                /repos/$GITHUB_REPOSITORY/issues/comments/$ISSUE_COMMENT_ID/reactions \
+                -f content='-1' 
+                echo "either Dockerfile_meta or Dockerfile does not exist" 
+                exit 1
+            fi
             while IFS= read -r line; do
               [[ "$line" == *"IMAGE_NAME"* ]] && echo "IMAGE_NAME=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
               [[ "$line" == *"IMAGE_VERSION"* ]] && echo "IMAGE_VERSION=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
