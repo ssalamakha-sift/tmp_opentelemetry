@@ -1,0 +1,32 @@
+name: Publish custom Docker Image to GCR
+
+on:
+  issue_comment:
+    types: [created]
+
+env:
+  REGESTRY: gcr.io
+  PROJECT_ID: sift-shared-data
+  ISSUE_TITLE: ${{ github.event.issue.title }}
+
+
+jobs:     
+  prepare_dockerfile_java:
+    env:
+      DOCKERFILE_PATH: "./sift-java-base"
+      DEFAULT_BASE_IMAGE_NAME: "azul/zulu-openjdk"
+      BASE_IMAGE_NAME: NOT_SET
+      DEFAULT_BASE_IMAGE_VERSION: "11.0.13"
+      BASE_IMAGE_VERSION: NOT_SET
+      DEFAULT_OPEN_TELEMETRY_VERSION: "1.21.0"
+      OPEN_TELEMETRY_VERSION: NOT_SET
+      DEFAULT_CLOUD_PROFILER_VERSION: "20220905_RC00"
+      CLOUD_PROFILER_VERSION: NOT_SET
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse release 
+        run: |
+          set -euxo pipefail
+          echo $ISSUE_TITLE
+
+ 
