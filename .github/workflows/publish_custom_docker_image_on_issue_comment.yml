@@ -57,7 +57,7 @@ jobs:
         if: contains(env.ISSUE_TITLE, 'java')
         run: |
           echo $IS_DECLINED
-          if [ $IS_DECLINED = True ]; then
+          if [ $IS_DECLINED = true ]; then
             gh api --method POST -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" \
               /repos/$GITHUB_REPOSITORY/issues/comments/$ISSUE_COMMENT_ID/reactions -f content='-1' 
             echo "/build cmd is missing" 
