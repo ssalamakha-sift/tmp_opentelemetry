@@ -53,7 +53,7 @@ jobs:
         if: contains(env.ISSUE_TITLE, 'java')
         run: |
           echo $IS_DECLINED
-          if [ $IS_DECLINED = False ]; then
+          if [ $IS_DECLINED = True ]; then
           gh api \
             --method POST \
             -H "Accept: application/vnd.github+json" \
@@ -117,8 +117,9 @@ jobs:
         - name: Fetch Dockerfile metadata
           run: |
             set -euxo pipefail
-            [ -f "./assets/Dockerfile_meta" ] && echo "./assets/Dockerfile_meta exists" || echo "./assets/Dockerfile_meta not found" && exit 1
-            [ -f "./assets/Dockerfile" ] && echo "./assets/Dockerfile exists" || echo "./assets/Dockerfile not found" && exit 1
+            echo (ls -la ./assets)
+            [[ -f "./assets/Dockerfile_meta" ]] && echo "./assets/Dockerfile_meta exists" || echo "./assets/Dockerfile_meta not found" && exit 1
+            [[ -f "./assets/Dockerfile" ]] && echo "./assets/Dockerfile exists" || echo "./assets/Dockerfile not found" && exit 1
             while IFS= read -r line; do
               [[ "$line" == *"IMAGE_NAME"* ]] && echo "IMAGE_NAME=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
               [[ "$line" == *"IMAGE_VERSION"* ]] && echo "IMAGE_VERSION=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
@@ -135,11 +136,21 @@ jobs:
 
             cat ./Dockerfile
 
+            gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/$GITHUB_REPOSITORY/issues/comments/$ISSUE_COMMENT_ID/reactions \
+              -f content='rocket' 
             echo "NOT IMPLEMENTED YET" && exit 0
             docker build -t $IMAGE_NAME:$IMAGE_VERSION .
             docker tag "$IMAGE_NAME:$IMAGE_VERSION" "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION" 
             docker push "$REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_VERSION"
-
-
-
- 
+        - name: Add issue comment reaction Done
+          run: |
+            gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/$GITHUB_REPOSITORY/issues/comments/$ISSUE_COMMENT_ID/reactions \
+              -f content='rocket' 
