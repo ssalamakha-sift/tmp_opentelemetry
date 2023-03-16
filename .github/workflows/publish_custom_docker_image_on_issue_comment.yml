@@ -38,6 +38,7 @@ jobs:
           [[ "$TAG" == "NOT_SET" ]] && echo "TAG=$(echo $DEFAULT_TAG)" >> $GITHUB_ENV
           for input in $(echo $ISSUE_COMMENT_BODY | tr -d '\r')
           do
+            [[ "$input" != "/build "* ]] && echo "Unknown cmd" && exit 1
             [[ "$input" == *"BASE_IMAGE_NAME"* ]] && echo "BASE_IMAGE_NAME=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"BASE_IMAGE_VERSION"* ]] && echo "BASE_IMAGE_VERSION=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"OPEN_TELEMETRY_VERSION"* ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
@@ -91,6 +92,8 @@ jobs:
         - name: Fetch Dockerfile metadata
           run: |
             set -euxo pipefail
+            [ -f "./assets/Dockerfile_meta" ] && echo "./assets/Dockerfile_meta exists" || echo "./assets/Dockerfile_meta not found" && exit 1
+            [ -f "./assets/Dockerfile" ] && echo "./assets/Dockerfile exists" || echo "./assets/Dockerfile not found" && exit 1
             while IFS= read -r line; do
               [[ "$line" == *"IMAGE_NAME"* ]] && echo "IMAGE_NAME=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
               [[ "$line" == *"IMAGE_VERSION"* ]] && echo "IMAGE_VERSION=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
