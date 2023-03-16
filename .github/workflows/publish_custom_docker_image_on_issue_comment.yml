@@ -47,6 +47,8 @@ jobs:
       - name: Check out repository
         if: contains(env.ISSUE_TITLE, 'java')
         uses: actions/checkout@v3
+        with:
+          ref: "$TAG"
       - name: Prepare Dockerfile metadata 
         if: contains(env.ISSUE_TITLE, 'java')
         run: |   
