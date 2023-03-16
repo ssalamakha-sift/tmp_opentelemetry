@@ -41,9 +41,6 @@ jobs:
           [[ "$CLOUD_PROFILER_VERSION" == "NOT_SET" ]] && echo "CLOUD_PROFILER_VERSION=$(echo $DEFAULT_CLOUD_PROFILER_VERSION)" >> $GITHUB_ENV
           [[ "$TAG" == "NOT_SET" ]] && echo "TAG=$(echo $DEFAULT_TAG)" >> $GITHUB_ENV
 
-          arr=$(echo $ISSUE_COMMENT_BODY | tr -d '\r')
-          echo ${arr[0]}
-          echo ${arr[1]}
           CMD_PATTERN="^\/build\s.*$"
           [[ $ISSUE_COMMENT_BODY =~ CMD_PATTERN ]] && echo "IS_DECLINED=False" >> $GITHUB_ENV
 
