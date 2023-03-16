@@ -1,0 +1,5 @@
+with params:
+BASE_IMAGE_NAME:azul/zulu-openjdk-tmp
+BASE_IMAGE_VERSION:11.0.20
+OPEN_TELEMETRY_VERSION:1.21.0
+TAG:v1_java
