@@ -44,15 +44,14 @@ jobs:
           BODY=$(echo $ISSUE_COMMENT_BODY | tr -d '\r')
 
           [[ $BODY == "/build"* ]] && echo "IS_DECLINED=False" >> $GITHUB_ENV && echo "ISSUE_COMMENT_BODY starts with /build" || echo "ISSUE_COMMENT_BODY does not start with /build"
-
-          for input in $(echo $ISSUE_COMMENT_BODY | tr -d '\r')
-          do
+          
+          while read -r input; do
             [[ "$input" == *"BASE_IMAGE_NAME"* ]] && echo "BASE_IMAGE_NAME=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"BASE_IMAGE_VERSION"* ]] && echo "BASE_IMAGE_VERSION=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"OPEN_TELEMETRY_VERSION"* ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"CLOUD_PROFILER_VERSION"* ]] && echo "CLOUD_PROFILER_VERSION=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"TAG"* ]] && echo "TAG=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
-          done
+          done <<< "$(echo "$ISSUE_COMMENT_BODY" | tr -d '\r')"
       - name: Add issue comment reaction WIP or decline
         if: contains(env.ISSUE_TITLE, 'java')
         run: |
