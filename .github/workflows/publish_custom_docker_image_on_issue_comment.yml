@@ -42,9 +42,8 @@ jobs:
           [[ "$TAG" == "NOT_SET" ]] && echo "TAG=$(echo $DEFAULT_TAG)" >> $GITHUB_ENV
 
           BODY=$(echo $ISSUE_COMMENT_BODY | tr -d '\r')
-          echo $BODY
-          CMD_PATTERN="^\/build\s.*$"
-          [[ $BODY =~ $CMD_PATTERN ]] && echo "IS_DECLINED=False" >> $GITHUB_ENV
+
+          [[ $BODY == "/build"* ]] && echo "IS_DECLINED=False" >> $GITHUB_ENV && echo "ISSUE_COMMENT_BODY starts with /build" || echo "ISSUE_COMMENT_BODY does not start with /build"
 
           for input in $(echo $ISSUE_COMMENT_BODY | tr -d '\r')
           do
