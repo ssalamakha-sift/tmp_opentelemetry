@@ -117,7 +117,7 @@ jobs:
         - name: Fetch Dockerfile metadata
           run: |
             set -euxo pipefail
-            echo (ls -la ./assets)
+            echo $(ls -la ./assets)
             [[ -f "./assets/Dockerfile_meta" ]] && echo "./assets/Dockerfile_meta exists" || echo "./assets/Dockerfile_meta not found" && exit 1
             [[ -f "./assets/Dockerfile" ]] && echo "./assets/Dockerfile exists" || echo "./assets/Dockerfile not found" && exit 1
             while IFS= read -r line; do
