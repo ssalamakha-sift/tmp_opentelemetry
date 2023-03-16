@@ -51,7 +51,8 @@ jobs:
             [[ "$input" == *"OPEN_TELEMETRY_VERSION"* ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"CLOUD_PROFILER_VERSION"* ]] && echo "CLOUD_PROFILER_VERSION=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"TAG"* ]] && echo "TAG=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
-          done <<< "$(echo "$ISSUE_COMMENT_BODY" | tr -d '\r')" && echo "OK" || echo "$? KO"
+            echo "OK"
+          done <<< "$(echo "$ISSUE_COMMENT_BODY" | tr -d '\r')" 
 
       - name: Add issue comment reaction WIP or decline
         if: contains(env.ISSUE_TITLE, 'java')
