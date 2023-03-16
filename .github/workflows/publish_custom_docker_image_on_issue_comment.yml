@@ -5,6 +5,7 @@ on:
     types: [created]
 
 env:
+  GH_TOKEN: ${{ github.token }}
   REGESTRY: gcr.io
   PROJECT_ID: sift-shared-data
   ISSUE_TITLE: ${{ github.event.issue.title }}
