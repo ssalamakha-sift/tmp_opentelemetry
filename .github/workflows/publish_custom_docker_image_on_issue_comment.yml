@@ -26,7 +26,7 @@ jobs:
       CLOUD_PROFILER_VERSION: NOT_SET
       DEFAULT_TAG: v1_java
       TAG: NOT_SET
-      IS_DECLINED: False
+      IS_DECLINED: True
     permissions:
       issues: write
     runs-on: ubuntu-latest
@@ -40,9 +40,9 @@ jobs:
           [[ "$OPEN_TELEMETRY_VERSION" == "NOT_SET" ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $DEFAULT_OPEN_TELEMETRY_VERSION)" >> $GITHUB_ENV
           [[ "$CLOUD_PROFILER_VERSION" == "NOT_SET" ]] && echo "CLOUD_PROFILER_VERSION=$(echo $DEFAULT_CLOUD_PROFILER_VERSION)" >> $GITHUB_ENV
           [[ "$TAG" == "NOT_SET" ]] && echo "TAG=$(echo $DEFAULT_TAG)" >> $GITHUB_ENV
+          [[ $ISSUE_COMMENT_BODY == "/build "* ]] && echo "IS_DECLINED=False" >> $GITHUB_ENV
           for input in $(echo $ISSUE_COMMENT_BODY | tr -d '\r')
           do
-            [[ "$input" != "/build "* ]] && echo "IS_DECLINED=True" >> $GITHUB_ENV && continue
             [[ "$input" == *"BASE_IMAGE_NAME"* ]] && echo "BASE_IMAGE_NAME=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"BASE_IMAGE_VERSION"* ]] && echo "BASE_IMAGE_VERSION=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
             [[ "$input" == *"OPEN_TELEMETRY_VERSION"* ]] && echo "OPEN_TELEMETRY_VERSION=$(echo $input | cut -d ':' -f2 | tr -d ' ')" >> $GITHUB_ENV && continue
