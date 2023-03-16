@@ -30,6 +30,6 @@ jobs:
           set -euxo pipefail
           echo $ISSUE_TITLE
           echo $ISSUE_COMMENT
-          echo ${{ github.event.issue_comment.comment }}
+          echo ${{ github.event.issue_comment.body }}
 
  
