@@ -39,6 +39,7 @@ Thumbs.db
 # mac bundle stuff
 *.dmg
 *.app
+.DS_Store
 
 # resharper
 *_Resharper.*

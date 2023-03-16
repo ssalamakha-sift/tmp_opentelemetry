@@ -104,6 +104,8 @@ jobs:
             echo $IMAGE_NAME
             echo $IMAGE_VERSION
 
+            cat ./Dockerfile
+
             echo "NOT IMPLEMENTED YET" && exit 0
             docker build -t $IMAGE_NAME:$IMAGE_VERSION .
             docker tag "$IMAGE_NAME:$IMAGE_VERSION" "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION" 
