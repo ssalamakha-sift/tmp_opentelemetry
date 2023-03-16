@@ -27,6 +27,8 @@ jobs:
       DEFAULT_TAG: v1_java
       TAG: NOT_SET
       IS_DECLINED: False
+    permissions:
+      issue: write
     runs-on: ubuntu-latest
     steps:
       - name: Parse issue comment body
