@@ -27,8 +27,7 @@ jobs:
           JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F: '{print $2}')
           OPEN_TELEMETRY_VERSION=$(grep -E "^ARG OPEN_TELEMETRY_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}' | head -1)
           CLOUD_PROFILER_VERSION=$(grep -E "^ARG CLOUD_PROFILER_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}' | head -1)
-          NL=$'\n'
-          echo "RELEASE_BODY=JAVA_OPENJDK_NAME=${JAVA_OPENJDK_NAME}${NL}JAVA_OPENJDK_VEERSION=${JAVA_OPENJDK_VEERSION}${NL}OPEN_TELEMETRY_VERSION=${OPEN_TELEMETRY_VERSION}${NL}CLOUD_PROFILER_VERSION=${CLOUD_PROFILER_VERSION}" >> $GITHUB_ENV
+          printf '%s\n' "JAVA_OPENJDK_NAME=$JAVA_OPENJDK_NAME" "JAVA_OPENJDK_VEERSION=$JAVA_OPENJDK_VEERSION" "OPEN_TELEMETRY_VERSION=$OPEN_TELEMETRY_VERSION" "CLOUD_PROFILER_VERSION=$CLOUD_PROFILER_VERSION" > ./release_notes.md
           JAVA_LAST_TAG=$( git tag --sort=-creatordate | grep java | head -1 | cut -d "_" -f1 | cut -d "v" -f2)
           [[ -z $JAVA_LAST_TAG ]] && JAVA_LAST_TAG=1 || JAVA_LAST_TAG=$((JAVA_LAST_TAG + 1))
           JAVA_LAST_TAG="v"$JAVA_LAST_TAG"_java"
@@ -45,20 +44,13 @@ jobs:
                 sha: context.sha
             })
       - name: Create Release
-        uses: actions/github-script@v6
+        uses: ncipollo/release-action@v1
         with:
-          script: |         
-            github.rest.repos.createRelease({
-                body: process.env.RELEASE_BODY,
-                draft: false,
-                generate_release_notes: false,
-                name: 'Release DOCKER_IMAGE_FOR:java',
-                owner: context.repo.owner,
-                prerelease: false,
-                repo: context.repo.repo,
-                skipIfReleaseExists: true,
-                tag_name: process.env.JAVA_LAST_TAG,
-              })
+          bodyFile: "release_notes.md"
+          name: "Release DOCKER_IMAGE_FOR:java"
+          tag: "$JAVA_LAST_TAG"
+
+
 
 
 
