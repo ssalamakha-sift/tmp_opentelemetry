@@ -42,17 +42,17 @@ jobs:
       DOCKERFILE_PATH: "./sift-python-base"  
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/upload-artifact@v3
-        if: contains(env.RELEASE_NAME, 'python')
-        with:
-          name: assets
-          path: ./assets 
       - name: Dummy step
         if: contains(env.RELEASE_NAME, 'python')
         run: |
           mkdir -p ./assets 
           echo "test" > ./assets/Dummyfile
-          echo "NOT IMPLEMENTED YET" && exit 0
+          echo "NOT IMPLEMENTED YET"
+      - uses: actions/upload-artifact@v3
+        if: contains(env.RELEASE_NAME, 'python')
+        with:
+          name: assets
+          path: ./assets 
   build_and_push:
       needs: [prepare_dockerfile_java, prepare_dockerfile_python]
       runs-on: ubuntu-latest
