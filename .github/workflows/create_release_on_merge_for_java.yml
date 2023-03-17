@@ -29,12 +29,10 @@ jobs:
           [[ -z $JAVA_LAST_TAG ]] && JAVA_LAST_TAG=1 || JAVA_LAST_TAG=$((JAVA_LAST_TAG + 1))
           echo "JAVA_LAST_TAG=v$JAVA_LAST_TAG_java" >> $GITHUB_ENV
       - uses: rickstaa/action-create-tag@v1
-        name: Create Tag
         with:
           tag: "$JAVA_LAST_TAG"
           tag_exists_error: true
       - uses: ncipollo/release-action@v1
-        name: Create Release
         with:
           bodyFile: "release_notes.md"
           name: "Release DOCKER_IMAGE_FOR:java"
