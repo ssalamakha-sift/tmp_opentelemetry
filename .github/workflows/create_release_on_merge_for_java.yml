@@ -28,10 +28,11 @@ jobs:
           OPEN_TELEMETRY_VERSION=$(grep -E "^ARG OPEN_TELEMETRY_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}')
           CLOUD_PROFILER_VERSION=$(grep -E "^ARG CLOUD_PROFILER_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}')
           printf '%s\n' "JAVA_OPENJDK_NAME=$JAVA_OPENJDK_NAME" "JAVA_OPENJDK_VEERSION=$JAVA_OPENJDK_VEERSION" "OPEN_TELEMETRY_VERSION=$OPEN_TELEMETRY_VERSION" "CLOUD_PROFILER_VERSION=$CLOUD_PROFILER_VERSION" > ./release_notes.md
-          echo $(git tag --sort=-creatordate)
           JAVA_LAST_TAG=$( git tag --sort=-creatordate | grep java | head -1 | cut -d "_" -f1 | cut -d "v" -f2)
           [[ -z $JAVA_LAST_TAG ]] && JAVA_LAST_TAG=1 || JAVA_LAST_TAG=$((JAVA_LAST_TAG + 1))
-          echo "JAVA_LAST_TAG=v$JAVA_LAST_TAG_java" >> $GITHUB_ENV
+          JAVA_LAST_TAG="v"$JAVA_LAST_TAG"_java"
+          echo $JAVA_LAST_TAG
+          echo "JAVA_LAST_TAG=$JAVA_LAST_TAG" >> $GITHUB_ENV
       - name: Create tag
         uses: actions/github-script@v5
         with:
