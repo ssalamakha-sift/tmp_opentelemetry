@@ -8,10 +8,10 @@ on:
       - './sift-java-base/Dockerfile'
 
 jobs:
-  env:
-    DOCKERFILE_PATH: "./sift-java-base"
   create_release:
     if: github.event.pull_request.merged == true
+    env:
+      DOCKERFILE_PATH: "./sift-java-base"
     permissions:
       contents: write
     runs-on: ubuntu-latest
