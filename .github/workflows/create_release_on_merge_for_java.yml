@@ -1,25 +1,43 @@
-name: Create Release on merge event
+name: Create java image Release on merge event
 
 on:
   pull_request_target:
     types:
       - closed
     paths:
-      - '**/Dockerfile'
-
-env:
-  REGESTRY: gcr.io
-
+      - './sift-java-base/Dockerfile'
 
 jobs:
-  dummy_job:
+  env:
+    DOCKERFILE_PATH: "./sift-java-base"
+  create_release:
     if: github.event.pull_request.merged == true
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
-      - name: Dummy
+      - name: Prepare Release metadata 
         run: |
-          echo $(ls -la)
+          JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' |  awk -F: '{print $1}' | tr / -)
+          JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F: '{print $2}')
+          OPEN_TELEMETRY_VERSION=$(grep -E "^ARG OPEN_TELEMETRY_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}')
+          CLOUD_PROFILER_VERSION=$(grep -E "^ARG CLOUD_PROFILER_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}')
+          printf '%s\n' "JAVA_OPENJDK_NAME=$JAVA_OPENJDK_NAME" "JAVA_OPENJDK_VEERSION=$JAVA_OPENJDK_VEERSION" "OPEN_TELEMETRY_VERSION=$OPEN_TELEMETRY_VERSION" "CLOUD_PROFILER_VERSION=$CLOUD_PROFILER_VERSION" > ./release_notes.md
+          JAVA_LAST_TAG=$( git tag --sort=-creatordate | grep java | head -1 | cut -d "_" -f1 | cut -d "v" -f2)
+          [[ -z $JAVA_LAST_TAG ]] && JAVA_LAST_TAG=1 || JAVA_LAST_TAG=$((JAVA_LAST_TAG + 1))
+          echo "JAVA_LAST_TAG=v$JAVA_LAST_TAG_java" >> $GITHUB_ENV
+      - uses: rickstaa/action-create-tag@v1
+        name: Create Tag
+        with:
+          tag: "$JAVA_LAST_TAG"
+          tag_exists_error: true
+      - uses: ncipollo/release-action@v1
+        name: Create Release
+        with:
+          bodyFile: "release_notes.md"
+          name: "Release DOCKER_IMAGE_FOR:java"
+          tag: "$JAVA_LAST_TAG"
 
 
