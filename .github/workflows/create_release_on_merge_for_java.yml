@@ -33,7 +33,6 @@ jobs:
           [[ -z $JAVA_LAST_TAG ]] && JAVA_LAST_TAG=1 || JAVA_LAST_TAG=$((JAVA_LAST_TAG + 1))
           JAVA_LAST_TAG="v"$JAVA_LAST_TAG"_java"
           echo "JAVA_LAST_TAG=$JAVA_LAST_TAG" >> $GITHUB_ENV
-          echo $RELEASE_BODY
       - name: Create tag
         uses: actions/github-script@v6
         with:
