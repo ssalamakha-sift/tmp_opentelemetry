@@ -48,7 +48,7 @@ jobs:
         with:
           bodyFile: "release_notes.md"
           name: "Release DOCKER_IMAGE_FOR:java"
-          tag: "$JAVA_LAST_TAG"
+          tag: ${{env.JAVA_LAST_TAG}}
 
 
 
