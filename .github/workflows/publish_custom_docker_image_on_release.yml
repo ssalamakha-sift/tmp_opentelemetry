@@ -51,6 +51,7 @@ jobs:
         if: contains(env.RELEASE_NAME, 'python')
         run: |
           mkdir -p ./assets 
+          echo "test" > ./assets/Dummyfile
           echo "NOT IMPLEMENTED YET" && exit 0
   build_and_push:
       needs: [prepare_dockerfile_java, prepare_dockerfile_python]
