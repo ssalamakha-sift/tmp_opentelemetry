@@ -1,0 +1,26 @@
+name: Create Release on merge event
+
+on:
+  pull_request_target:
+    paths:
+      - './sift-*-base/**'
+    types:
+      - closed
+
+env:
+  REGESTRY: gcr.io
+
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+  dummy_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Dummy
+        run: |
+          echo $(ls -la)
+
+
