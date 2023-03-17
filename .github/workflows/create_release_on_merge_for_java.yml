@@ -5,7 +5,7 @@ on:
     types:
       - closed
     paths:
-      - './sift-java-base/Dockerfile'
+      - 'sift-java-base/Dockerfile'
 
 jobs:
   create_release:
