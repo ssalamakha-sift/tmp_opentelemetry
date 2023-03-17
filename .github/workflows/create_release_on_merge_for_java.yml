@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Prepare Release metadata 
         run: |
+          set -euxo pipefail
           JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' |  awk -F: '{print $1}' | tr / -)
           JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F: '{print $2}')
           OPEN_TELEMETRY_VERSION=$(grep -E "^ARG OPEN_TELEMETRY_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}')
@@ -28,10 +29,16 @@ jobs:
           JAVA_LAST_TAG=$( git tag --sort=-creatordate | grep java | head -1 | cut -d "_" -f1 | cut -d "v" -f2)
           [[ -z $JAVA_LAST_TAG ]] && JAVA_LAST_TAG=1 || JAVA_LAST_TAG=$((JAVA_LAST_TAG + 1))
           echo "JAVA_LAST_TAG=v$JAVA_LAST_TAG_java" >> $GITHUB_ENV
-      - uses: rickstaa/action-create-tag@v1
+      - name: Create tag
+        uses: actions/github-script@v5
         with:
-          tag: "$JAVA_LAST_TAG"
-          tag_exists_error: true
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/$JAVA_LAST_TAG",
+              sha: context.sha
+            })
       - uses: ncipollo/release-action@v1
         with:
           bodyFile: "release_notes.md"
