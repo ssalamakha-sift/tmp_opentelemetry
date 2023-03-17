@@ -31,17 +31,18 @@ jobs:
           JAVA_LAST_TAG=$( git tag --sort=-creatordate | grep java | head -1 | cut -d "_" -f1 | cut -d "v" -f2)
           [[ -z $JAVA_LAST_TAG ]] && JAVA_LAST_TAG=1 || JAVA_LAST_TAG=$((JAVA_LAST_TAG + 1))
           JAVA_LAST_TAG="v"$JAVA_LAST_TAG"_java"
-          echo $JAVA_LAST_TAG
           echo "JAVA_LAST_TAG=$JAVA_LAST_TAG" >> $GITHUB_ENV
+          echo $JAVA_LAST_TAG
       - name: Create tag
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           script: |
+            const {JAVA_LAST_TAG} = process.env          
             github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: "refs/tags/$JAVA_LAST_TAG",
-              sha: context.sha
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/tags/${JAVA_LAST_TAG}`,
+                sha: context.sha
             })
       - uses: ncipollo/release-action@v1
         with:
