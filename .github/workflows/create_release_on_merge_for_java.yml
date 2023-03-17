@@ -25,8 +25,8 @@ jobs:
           set -euxo pipefail
           JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' |  awk -F: '{print $1}' | tr / -)
           JAVA_OPENJDK_VEERSION=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F: '{print $2}')
-          OPEN_TELEMETRY_VERSION=$(grep -E "^ARG OPEN_TELEMETRY_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}')
-          CLOUD_PROFILER_VERSION=$(grep -E "^ARG CLOUD_PROFILER_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}')
+          OPEN_TELEMETRY_VERSION=$(grep -E "^ARG OPEN_TELEMETRY_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}' | head -1)
+          CLOUD_PROFILER_VERSION=$(grep -E "^ARG CLOUD_PROFILER_VERSION.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' | awk -F= '{print $2}' | head -1)
           NL=$'\n'
           echo "RELEASE_BODY=JAVA_OPENJDK_NAME=${JAVA_OPENJDK_NAME}${NL}JAVA_OPENJDK_VEERSION=${JAVA_OPENJDK_VEERSION}${NL}OPEN_TELEMETRY_VERSION=${OPEN_TELEMETRY_VERSION}${NL}CLOUD_PROFILER_VERSION=${CLOUD_PROFILER_VERSION}" >> $GITHUB_ENV
           JAVA_LAST_TAG=$( git tag --sort=-creatordate | grep java | head -1 | cut -d "_" -f1 | cut -d "v" -f2)
