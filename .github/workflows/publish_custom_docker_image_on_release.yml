@@ -60,7 +60,7 @@ jobs:
       if: |
         always() && 
         (needs.prepare_dockerfile_java.result == 'success' || needs.prepare_dockerfile_java.result == 'skipped') && 
-        (needs.prepare_dockerfile_python.result == 'success' || needs.prepare_dockerfile_python.result == 'skipped') && 
+        (needs.prepare_dockerfile_python.result == 'success' || needs.prepare_dockerfile_python.result == 'skipped')
       runs-on: ubuntu-latest
       steps:
         - uses: actions/download-artifact@v3
