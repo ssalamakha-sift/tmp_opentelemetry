@@ -38,10 +38,12 @@ jobs:
           name: assets
           path: ./assets 
       - name: Check jobs statuses
+        env:
+          JOBS_CONTEXT: ${{ toJson(jobs) }}
         if: contains(env.RELEASE_NAME, 'java')
         run: |   
           set -euxo pipefail
-          echo ${{ github.jobs }}
+          echo $JOBS_CONTEXT
 
   prepare_dockerfile_python: 
     env:
