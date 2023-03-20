@@ -70,6 +70,22 @@ jobs:
               [[ "$line" == *"IMAGE_NAME"* ]] && echo "IMAGE_NAME=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
               [[ "$line" == *"IMAGE_VERSION"* ]] && echo "IMAGE_VERSION=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
             done < ./assets/Dockerfile_meta && echo "Dockerfile metadata parsed successfully"  ||  echo "exit code $? /assets/Dockerfile_meta is empty or does not exist"
+        - name: Login to GCR
+          uses: google-github-actions/setup-gcloud@v0.3.0 
+          with:
+            service_account_key: ${{ secrets.GCLOUD_SA_KEY }} 
+            project_id: ${{ env.PROJECT_ID }}    
+            export_default_credentials: true   
+        - name: Build Dockerfile
+          run: |
+            set -euxo pipefail
+            cd ./assets 
+            echo $(ls -la)
+            echo $IMAGE_NAME
+            echo $IMAGE_VERSION
+            docker build -t $IMAGE_NAME:$IMAGE_VERSION .
+        - name: Configure Docker Client
+          run: gcloud auth configure-docker --quiet 
         - name: Push Dockerfile
           run: |
             set -euxo pipefail
@@ -81,11 +97,7 @@ jobs:
             [[ $RELEASE_NAME == *"DOCKER_IMAGE_FOR:python"* ]] && DOCKER_IMAGE_FOR=python
             [[ $DOCKER_IMAGE_FOR == "NOT_SET" ]] && echo "DOCKER_IMAGE_FOR=$DOCKER_IMAGE_FOR" && exit 1
 
-            echo $IMAGE_NAME
-            echo $IMAGE_VERSION
-
-            echo "NOT IMPLEMENTED YET" && exit 0
-
-            docker build -t $IMAGE_NAME:$IMAGE_VERSION .
             docker tag "$IMAGE_NAME:$IMAGE_VERSION" "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION" 
             docker push "$REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_VERSION"
+
+            echo "docker image $REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_VERSION has been pushed successfully"
