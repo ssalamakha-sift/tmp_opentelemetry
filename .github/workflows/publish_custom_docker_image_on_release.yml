@@ -70,6 +70,10 @@ jobs:
               [[ "$line" == *"IMAGE_NAME"* ]] && echo "IMAGE_NAME=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
               [[ "$line" == *"IMAGE_VERSION"* ]] && echo "IMAGE_VERSION=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
             done < ./assets/Dockerfile_meta && echo "Dockerfile metadata parsed successfully"  ||  echo "exit code $? /assets/Dockerfile_meta is empty or does not exist"
+        - name: 'Login to GCP'
+          uses: 'google-github-actions/auth@v1'
+          with:
+            credentials_json: '${{ secrets.GCLOUD_SA_KEY }}'
         - name: 'Set up Cloud SDK'
           uses: 'google-github-actions/setup-gcloud@v1'
         - name: Build Dockerfile
@@ -80,11 +84,8 @@ jobs:
             echo $IMAGE_NAME
             echo $IMAGE_VERSION
             docker build -t $IMAGE_NAME:$IMAGE_VERSION .
-        - name: 'Login to GCP and Configure Docker Client'
-          run: |
-            echo $GCLOUD_SA_KEY | gcloud auth activate-service-account --key-file=-
-            gcloud --quiet config set project ${PROJECT_ID}
-            gcloud auth configure-docker ${REGESTRY}
+        - name: 'Configure Docker Client'
+          run: gcloud auth configure-docker --quiet
         - name: Push Dockerfile
           run: |
             set -euxo pipefail
