@@ -12,8 +12,9 @@ env:
 
 jobs:     
   prepare_dockerfile_java:
-    if: contains($RELEASE_NAME, 'java')
+    if: contains(env.JAVA_JOB, 'true')
     env:
+      JAVA_JOB: ${{ contains(github.event.release.name, 'java') }}
       DOCKERFILE_PATH: "./sift-java-base"
     runs-on: ubuntu-latest
     steps:
@@ -39,8 +40,9 @@ jobs:
           name: assets
           path: ./assets 
   prepare_dockerfile_python: 
-    if: contains($RELEASE_NAME, 'python')
+    if: contains(env.PYTHON_JOB, 'true')
     env:
+      PYTHON_JOB: ${{ contains(github.event.release.name, 'python') }}
       DOCKERFILE_PATH: "./sift-python-base"  
     runs-on: ubuntu-latest
     steps:
