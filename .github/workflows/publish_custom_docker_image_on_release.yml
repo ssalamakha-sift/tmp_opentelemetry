@@ -12,15 +12,14 @@ env:
 
 jobs:     
   prepare_dockerfile_java:
+    if: contains(env.RELEASE_NAME, 'java')
     env:
       DOCKERFILE_PATH: "./sift-java-base"
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        if: contains(env.RELEASE_NAME, 'java')
         uses: actions/checkout@v3
       - name: Prepare Dockerfile metadata 
-        if: contains(env.RELEASE_NAME, 'java')
         run: |   
           set -euxo pipefail
           JAVA_OPENJDK_NAME=$(grep -E "^FROM.*jdk.*$" $DOCKERFILE_PATH/Dockerfile | awk -F' '  '{print $2}' |  awk -F: '{print $1}' | tr / -)
@@ -33,36 +32,30 @@ jobs:
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> ./assets/Dockerfile_meta
           mv $DOCKERFILE_PATH/Dockerfile ./assets/Dockerfile
       - uses: actions/upload-artifact@v3
-        if: contains(env.RELEASE_NAME, 'java')
         with:
           name: assets
           path: ./assets 
-      - name: Check jobs statuses
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        if: contains(env.RELEASE_NAME, 'java')
-        run: |   
-          set -euxo pipefail
-          echo $GITHUB_CONTEXT
-
   prepare_dockerfile_python: 
+    if: contains(env.RELEASE_NAME, 'python')
     env:
       DOCKERFILE_PATH: "./sift-python-base"  
     runs-on: ubuntu-latest
     steps:
       - name: Dummy step
-        if: contains(env.RELEASE_NAME, 'python')
         run: |
           mkdir -p ./assets 
           echo "test" > ./assets/Dummyfile
           echo "NOT IMPLEMENTED YET"
       - uses: actions/upload-artifact@v3
-        if: contains(env.RELEASE_NAME, 'python')
         with:
           name: assets
           path: ./assets 
   build_and_push:
       needs: [prepare_dockerfile_java, prepare_dockerfile_python]
+      if: |
+        always() && 
+        (needs.prepare_dockerfile_java.result == 'success' || needs.prepare_dockerfile_java.result == 'skipped') && 
+        (needs.prepare_dockerfile_python.result == 'success' || needs.prepare_dockerfile_python.result == 'skipped') && 
       runs-on: ubuntu-latest
       steps:
         - uses: actions/download-artifact@v3
