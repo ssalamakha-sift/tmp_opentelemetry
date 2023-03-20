@@ -71,7 +71,7 @@ jobs:
               [[ "$line" == *"IMAGE_VERSION"* ]] && echo "IMAGE_VERSION=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
             done < ./assets/Dockerfile_meta && echo "Dockerfile metadata parsed successfully"  ||  echo "exit code $? /assets/Dockerfile_meta is empty or does not exist"
         - name: Login to GCR
-          uses: 'google-github-actions/setup-gcloud@master'
+          uses: 'google-github-actions/setup-gcloud@v1.1.0'
           with:
             service_account_key: ${{ secrets.GCLOUD_SA_KEY }}  
             project_id: ${{ env.PROJECT_ID }}
