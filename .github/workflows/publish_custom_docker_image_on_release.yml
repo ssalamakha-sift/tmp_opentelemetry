@@ -87,7 +87,6 @@ jobs:
             docker build -t $IMAGE_NAME:$IMAGE_VERSION .
         - name: 'Configure Docker Client'
           run: |
-            echo ${{ secrets.GCLOUD_SA_KEY }} | gcloud auth activate-service-account ${{ secrets.GCLOUD_GH_SA }} --key-file=-
             gcloud auth configure-docker ${REGESTRY} --quiet
         - name: Push Dockerfile
           run: |
