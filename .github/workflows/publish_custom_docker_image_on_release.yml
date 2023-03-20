@@ -12,7 +12,7 @@ env:
 
 jobs:     
   prepare_dockerfile_java:
-    if: contains(env.RELEASE_NAME, 'java')
+    if: contains(${{ env.RELEASE_NAME }}, 'java')
     env:
       DOCKERFILE_PATH: "./sift-java-base"
     runs-on: ubuntu-latest
