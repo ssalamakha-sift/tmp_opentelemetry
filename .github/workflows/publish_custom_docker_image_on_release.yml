@@ -41,7 +41,7 @@ jobs:
         if: contains(env.RELEASE_NAME, 'java')
         run: |   
           set -euxo pipefail
-          echo ${{ github }}
+          echo ${{ jobs }}
 
   prepare_dockerfile_python: 
     env:
