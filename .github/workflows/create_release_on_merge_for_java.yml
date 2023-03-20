@@ -1,4 +1,4 @@
-name: Create java image Release on merge event
+name: Create Release with java Dockerfile on merge event
 
 on:
   pull_request_target:

@@ -37,6 +37,12 @@ jobs:
         with:
           name: assets
           path: ./assets 
+      - name: Check jobs statuses
+        if: contains(env.RELEASE_NAME, 'java')
+        run: |   
+          set -euxo pipefail
+          echo ${{ github }}
+
   prepare_dockerfile_python: 
     env:
       DOCKERFILE_PATH: "./sift-python-base"  
