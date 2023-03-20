@@ -2,7 +2,7 @@ name: Publish custom Docker Image to GCR
 
 on:
   release:
-    types: [published, created]
+    types: [published]
 
 env:
   REGESTRY: gcr.io
