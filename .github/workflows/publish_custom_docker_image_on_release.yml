@@ -98,6 +98,6 @@ jobs:
             [[ $DOCKER_IMAGE_FOR == "NOT_SET" ]] && echo "DOCKER_IMAGE_FOR=$DOCKER_IMAGE_FOR" && exit 1
 
             docker tag "$IMAGE_NAME:$IMAGE_VERSION" "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION" 
-            docker push "$REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_VERSION"
+            docker push "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION"
 
-            echo "docker image $REGESTRY/$PROJECT_ID/base/$IMAGE_NAME:$IMAGE_VERSION has been pushed successfully"
+            echo "docker image $$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION has been pushed successfully"
