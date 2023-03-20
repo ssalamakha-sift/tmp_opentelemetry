@@ -71,11 +71,9 @@ jobs:
               [[ "$line" == *"IMAGE_VERSION"* ]] && echo "IMAGE_VERSION=$(echo $line | cut -d '=' -f2)" >> $GITHUB_ENV && continue
             done < ./assets/Dockerfile_meta && echo "Dockerfile metadata parsed successfully"  ||  echo "exit code $? /assets/Dockerfile_meta is empty or does not exist"
         - name: Login to GCR
-          uses: google-github-actions/setup-gcloud@v0.3.0 
+          uses: 'google-github-actions/auth@v1'
           with:
-            service_account_key: ${{ secrets.GCLOUD_SA_KEY }} 
-            project_id: ${{ env.PROJECT_ID }}    
-            export_default_credentials: true   
+            credentials_json: ${{ secrets.GCLOUD_SA_KEY }}  
         - name: Build Dockerfile
           run: |
             set -euxo pipefail
@@ -84,6 +82,8 @@ jobs:
             echo $IMAGE_NAME
             echo $IMAGE_VERSION
             docker build -t $IMAGE_NAME:$IMAGE_VERSION .
+        - name: 'Set up Cloud SDK'
+          uses: 'google-github-actions/setup-gcloud@v1'
         - name: Configure Docker Client
           run: gcloud auth configure-docker --quiet 
         - name: Push Dockerfile
