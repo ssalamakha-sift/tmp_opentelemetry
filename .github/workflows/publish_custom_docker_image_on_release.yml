@@ -71,7 +71,7 @@ jobs:
             name: assets
             path: ./assets
         - name: Check Docker biuld and push target
-          run:
+          run: |
             DOCKER_IMAGE_FOR=NOT_SET
             [[ $RELEASE_NAME == *"java"* ]] && DOCKER_IMAGE_FOR=java
             [[ $RELEASE_NAME == *"python"* ]] && DOCKER_IMAGE_FOR=python
