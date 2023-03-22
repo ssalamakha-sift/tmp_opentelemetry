@@ -12,13 +12,17 @@ env:
 
 jobs:     
   prepare_dockerfile_java:
-    if: contains(github.event.release.name, 'java')
+    if: contains(github.event.release.name, 'sift-base-java')
     env:
-      DOCKERFILE_PATH: "./sift-java-base"
+      DOCKERFILE_PATH: "./sift-base-java"
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
+      - name: Validate Dockerfile Path
+        run: | 
+          set -euxo pipefail
+          [[ ! -f "$DOCKERFILE_PATH" ]] && echo "folder $DOCKERFILE_PATH does not exist" && exit 1       
       - name: Prepare Dockerfile metadata 
         run: |   
           set -euxo pipefail
@@ -36,13 +40,14 @@ jobs:
           name: assets
           path: ./assets 
   prepare_dockerfile_python: 
-    if: contains(github.event.release.name, 'python')
+    if: contains(github.event.release.name, 'sift-base-python')
     env:
-      DOCKERFILE_PATH: "./sift-python-base"  
+      DOCKERFILE_PATH: "./sift-base-python"  
     runs-on: ubuntu-latest
     steps:
       - name: Dummy step
         run: |
+          [[ ! -f "$DOCKERFILE_PATH" ]] && echo "folder $DOCKERFILE_PATH does not exist" && exit 1
           mkdir -p ./assets 
           echo "test" > ./assets/Dummyfile
           echo "NOT IMPLEMENTED YET"
@@ -62,6 +67,13 @@ jobs:
           with:
             name: assets
             path: ./assets
+        - name: Check Docker biuld and push target
+          run:
+            DOCKER_IMAGE_FOR=NOT_SET
+            [[ $RELEASE_NAME == *"java"* ]] && DOCKER_IMAGE_FOR=java
+            [[ $RELEASE_NAME == *"python"* ]] && DOCKER_IMAGE_FOR=python
+            [[ $DOCKER_IMAGE_FOR == "NOT_SET" ]] && echo "DOCKER_IMAGE_FOR=$DOCKER_IMAGE_FOR" && exit 1
+            echo "DOCKER_IMAGE_FOR=$DOCKER_IMAGE_FOR" >> $GITHUB_ENV
         - name: Fetch Dockerfile metadata
           run: |
             set -euxo pipefail
@@ -81,12 +93,12 @@ jobs:
           run: |
             set -euxo pipefail
             cd ./assets 
-            echo $(ls -la)
             echo $IMAGE_NAME
             echo $IMAGE_VERSION
             docker build -t $IMAGE_NAME:$IMAGE_VERSION .
         - name: 'Configure Docker Client'
           run: |
+            echo $(whoami)
             gcloud auth configure-docker ${REGESTRY} --quiet
         - name: Push Dockerfile
           run: |
@@ -94,12 +106,6 @@ jobs:
             cd ./assets 
             echo $(ls -la)
 
-            DOCKER_IMAGE_FOR=NOT_SET
-            [[ $RELEASE_NAME == *"DOCKER_IMAGE_FOR:java"* ]] && DOCKER_IMAGE_FOR=java
-            [[ $RELEASE_NAME == *"DOCKER_IMAGE_FOR:python"* ]] && DOCKER_IMAGE_FOR=python
-            [[ $DOCKER_IMAGE_FOR == "NOT_SET" ]] && echo "DOCKER_IMAGE_FOR=$DOCKER_IMAGE_FOR" && exit 1
-
-            docker tag "$IMAGE_NAME:$IMAGE_VERSION" "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION" 
-            docker push "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION"
+            docker buildx build --platform linux/amd64 -t "$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION" . --push
 
             echo "docker image $$REGESTRY/$PROJECT_ID/base/$DOCKER_IMAGE_FOR/$IMAGE_NAME:$IMAGE_VERSION has been pushed successfully"
