@@ -22,8 +22,7 @@ jobs:
       - name: Validate Dockerfile Path
         run: | 
           set -euxo pipefail
-          echo $(ls -la)
-          [[ ! -f "$DOCKERFILE_PATH" ]] && echo "folder $DOCKERFILE_PATH does not exist" && exit 1       
+          [[ ! -f "$DOCKERFILE_PATH/Dockerfile" ]] && echo "Dockerfile does not exist in $DOCKERFILE_PATH directory" && exit 1       
       - name: Prepare Dockerfile metadata 
         run: |   
           set -euxo pipefail
